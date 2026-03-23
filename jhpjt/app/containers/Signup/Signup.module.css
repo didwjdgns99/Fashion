@@ -1,0 +1,77 @@
+.signupContainer form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.signupContainer input {
+  width: 605px;
+  height: 56px;
+  border-radius: 16px;
+  border: 1px solid #6a6a6a;
+  padding: 17.5px 24px;
+  box-sizing: border-box;
+}
+
+.signup_email {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.signup_email span {
+  font-size: 12px;
+}
+
+.signup_password {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.signup_password span {
+  font-size: 12px;
+}
+
+.signup_password_check {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.signup_password_check span {
+  font-size: 12px;
+}
+
+.signup_btn {
+  width: 605px;
+  height: 60px;
+  border-radius: 16px;
+  border: none;
+  background-color: #cccccc;
+  color: #ffffff;
+  cursor: pointer;
+}
+.signup_btn:hover {
+  background-color: #a7a5a5;
+  transition: 0.3s;
+}
+
+.password_area {
+  position: relative;
+}
+
+.blank_img {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.blank_img {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}

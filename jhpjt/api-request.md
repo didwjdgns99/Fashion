@@ -1,0 +1,4 @@
+- 모든 클라이언트 데이터 통신은 React Query로 상태를 관리한다.
+- 사용자 인터랙션 기반의 빈번한 조회(무한스크롤/검색/필터)는 Route Handler(/api/\*)를 queryFn에서 호출한다.
+- 그 외 조회 및 모든 변경(POST/PATCH/DELETE)은 Server Action을 호출한다.
+- http 모듈은 Server Action 또는 Route Handler 내부에서만 사용한다.
