@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-const { users } = require("../mocks/user.mock");
+// const { users } = require("../mocks/user.mock");
+const User = require("../models/user.model");
 const bcrypt = require("bcrypt"); //비밀번호 저장 해싱 라이브러리
 
 const ERROR_MESSAGE = {
@@ -9,7 +10,7 @@ const ERROR_MESSAGE = {
 };
 
 async function loginService({ email, password }) {
-  const user = users.find((user) => user.email === email);
+  const user = await User.findOne({ email });
   if (!user) {
     const err = new Error(ERROR_MESSAGE.USER_NOT_FOUND);
     err.code = ERROR_MESSAGE.USER_NOT_FOUND;
@@ -18,7 +19,7 @@ async function loginService({ email, password }) {
 
   //DB에 해싱되서 보관되어있는 값과 사용자가 입력한 비밀번호값을 해싱해서 비교
   //argon은 저장된 해시값 먼저
-  const isMatch = await argon2.verify(user.password, password);
+  const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
     const err = new Error(ERROR_MESSAGE.INVALID_PASSWORD);
@@ -33,7 +34,11 @@ async function loginService({ email, password }) {
     throw err;
   }
 
-  const token = jwt.sign({ userId: user.id }, secret, { expiresIn: "1h" });
+  const token = jwt.sign(
+    { userId: user.id, email: user.email, nickName: user.nickName },
+    secret,
+    { expiresIn: "1h" },
+  );
 
   return {
     userId: user.id,
