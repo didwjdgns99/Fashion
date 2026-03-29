@@ -41,6 +41,7 @@ export async function http(
       ...options,
       // method, body, credentials 등 사용자가 전달한 fetch 옵션 적용
     });
+
     const contentType = res.headers.get("content-type") ?? "";
     const isJson = contentType.includes("application/json");
     if (!res.ok) {
@@ -49,8 +50,13 @@ export async function http(
         : await res.text().catch(() => "");
       throw new ApiError(res.status, errorBody?.message || DEFAULT);
     }
-
-    return await res.json();
+    if (!isJson) {
+      console.log("JSON 응답 아님");
+      return null;
+    }
+    //return await res.json();
+    const data = await res.json();
+    return data;
   } catch (error) {
     //error의 브라우저에서 만든 에러이면서 이름이 AbortError인 경우
     if (error instanceof DOMException && error.name === "AbortError") {
@@ -59,6 +65,7 @@ export async function http(
     if (error instanceof ApiError) {
       throw error;
     }
+
     throw new ApiError(500, UNKNOWN);
   } finally {
     clearTimeout(timeout);

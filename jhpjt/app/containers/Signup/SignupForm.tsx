@@ -174,7 +174,7 @@ export default function SignupForm() {
         </div>
 
         <button
-          className={`w-full h-[56px] rounded-[16px] ${isValid ? "bg-black text-white" : "bg-gray-300 text-white"} cursor-pointer bg-gray-100 shadow-inner shadow-md hover:shadow-lg transition-shadow mt-10`}
+          className={`w-full h-[56px] rounded-[16px] ${isValid ? "bg-black text-white" : "bg-gray-300 text-white"} cursor-pointer  shadow-inner shadow-md hover:shadow-lg transition-shadow mt-10`}
           type="submit"
           onSubmit={onSubmit}
           disabled={!isValid || isPending}

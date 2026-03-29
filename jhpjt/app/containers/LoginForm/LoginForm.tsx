@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useLogin } from "@/libs/hooks/useLogin";
 import { useRouter } from "next/navigation";
-import InputCheck from "@/app/components/Input/InputCheck";
+import google from "@/public/image/google.png";
 
 export default function LoginForm() {
   const [show, setShow] = useState(false);
@@ -82,6 +82,15 @@ export default function LoginForm() {
           disabled={!isValid || isPending}
         >
           {isPending ? "처리중" : "로그인"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/oauth/google`;
+          }}
+          className="w-full h-[56px] rounded-[16px] flex justify-center items-center bg-gray-100 shadow-md hover:shadow-lg transition-all cursor-pointer"
+        >
+          <Image src={google} alt="구글 로그인" width={24} height={24} />
         </button>
       </form>
     </div>

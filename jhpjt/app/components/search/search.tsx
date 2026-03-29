@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import searchIcon from "@/public/image/searchIcon.png";
-import { useDebounce } from "@/libs/hooks/useDebounce";
+import useDebounce from "@/libs/hooks/useDebounce";
 import FilterBtn from "../filterBtn";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CATEGORIES } from "@/libs/types/category";
@@ -17,23 +17,26 @@ export default function Search({
   category = "",
 }: SearchProps) {
   const [keyword, setKeyword] = useState(defaultValue); //사용자가 검색한 키워드가 될 value 초기값은 ""
-  useDebounce({ keyword });
+  const debounceKeyword = useDebounce({ value: keyword, delay: 500 }); //debounce된 키워드
 
   const router = useRouter();
-  const pathname = usePathname();
+  const pathName = usePathname();
   const searchParams = useSearchParams();
 
-  // const handleCategoryClick = (setCategory: string) => {
-  //   const params = new URLSearchParams(searchParams.toString());
+  useEffect(() => {
+    const parmas = new URLSearchParams(searchParams.toString());
+    const trimmedKeyword = debounceKeyword.trim();
 
-  //   if (setCategory) {
-  //     params.set("category", setCategory);
-  //   } else {
-  //     params.delete("category");
-  //   }
+    if (trimmedKeyword) {
+      parmas.set("keyword", trimmedKeyword);
+    } else {
+      parmas.delete("keyword");
+    }
 
-  //   router.push(`${pathname}?${params.toString()}`);
-  // };
+    parmas.delete("cursor");
+
+    router.replace(`${pathName}?${parmas.toString()}`);
+  }, [debounceKeyword]);
 
   const handleCategoryClick = (setCategory: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -43,7 +46,7 @@ export default function Search({
     } else {
       params.delete("category");
     }
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`${pathName}?${params.toString()}`);
   };
 
   return (
@@ -63,7 +66,7 @@ export default function Search({
           className="absolute w-6 h-6 right-8 top-2"
         />
       </div>
-      <div className="flex justify-start gap-2">
+      <div className="flex justify-start gap-2 mb-2">
         <FilterBtn
           label="전체"
           isActive={category === ""}
