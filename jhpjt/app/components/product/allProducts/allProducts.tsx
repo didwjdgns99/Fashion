@@ -86,7 +86,7 @@ export default function AllProducts({ keyword, category }: AllProductsProps) {
   } = useGetProductsInfinite(keyword, category);
 
   const products = useMemo(
-    () => data?.pages.flatMap((page) => page.products) ?? [],
+    () => data?.pages.flatMap((page) => page.products ?? []) ?? [],
     [data],
   );
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -133,7 +133,9 @@ export default function AllProducts({ keyword, category }: AllProductsProps) {
 
   if (isPending) return <p>로딩중...</p>;
   if (isError) return <p>에러: {(error as Error).message}</p>;
-
+  if (!isPending && products.length === 0 && keyword) {
+    return <p>"{keyword}" 에 대한 검색결과가 없습니다.</p>;
+  }
   return (
     <>
       <div className="grid grid-cols-2 gap-4">

@@ -36,7 +36,7 @@ export default function Search({
     parmas.delete("cursor");
 
     router.replace(`${pathName}?${parmas.toString()}`);
-  }, []);
+  }, [debounceKeyword]);
 
   const handleCategoryClick = (setCategory: string) => {
     const params = new URLSearchParams(searchParams.toString());
