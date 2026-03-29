@@ -14,17 +14,11 @@ const OAUTH_ERROR_MESSAGE = {
 };
 
 async function getGoogleToken(code) {
-  // if (!code) {
-  //   const err = new Error(OAUTH_ERROR_MESSAGE.CODE_MISSING);
-  //   err.status = 400;
-  //   throw err;
-  // }
-
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID, //구글 클라이언트 아이디 어떤 아이디한테 받을건지
     client_secret: process.env.GOOGLE_CLIENT_SECRET, //그 아이디의 시크릿키가 뭔지 아이디 비번 둘 다 맞아야 토큰 발급
     redirect_uri: process.env.GOOGLE_REDIRECT_URI, //실행 후 다시 서버로 콜백
-    grant_type: "authorization_code", //
+    grant_type: "authorization_code",
     code, //구글에 데이터르 코드로 받아서 사용
   });
 

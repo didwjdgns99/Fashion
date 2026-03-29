@@ -33,9 +33,9 @@ async function googleOAuthCallback(req, res) {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: 1000 * 60 * 60,
     });
 
     return res.redirect(process.env.CLIENT_URL);
