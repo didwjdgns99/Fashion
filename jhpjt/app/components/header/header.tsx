@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Heading from "@/public/image/Heading.png";
-import userRegular from "@/public/image/userRegular.png";
-import cartShopping from "@/public/image/cartShopping.png";
+import Avatar from "@/app/components/Avatar/Avatar";
+// import basketIcon from "@/public/image/basketIcon.svg";
 
 export default function Header() {
   return (
@@ -13,9 +13,18 @@ export default function Header() {
         height={34}
         className="h-[30px]"
       />
-      <div className="flex gap-1">
-        {/* <Image src={userRegular} alt="마이페이지" className="w-6 h-6" /> 
-        <Image src={cartShopping} alt="장바구니" className="w-6 h-6" /> */}
+      <div className="flex gap-4">
+        <button>
+          <Avatar size="sm" className="font-bold text-white cursor-pointer" />
+        </button>
+        {/* <button className="relative w-7 h-7 cursor-pointer">
+          <Image
+            src={basketIcon}
+            alt="장바구니"
+            fill
+            className="object-contain brightness-0"
+          />
+        </button> */}
       </div>
     </div>
   );
