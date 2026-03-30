@@ -4,11 +4,13 @@ const signUpRoute = require("./signUp.route");
 const loginRoute = require("./login.route");
 const productsRoute = require("./products.route");
 const oauthRoute = require("./oauth.route");
+const getMeRoute = require("./getMe.route");
 
 apiRoute.use("/users", usersRoute);
 apiRoute.use("/signup", signUpRoute);
 apiRoute.use("/login", loginRoute);
 apiRoute.use("/products", productsRoute);
 apiRoute.use("/oauth", oauthRoute);
+apiRoute.use("/me", getMeRoute);
 
 module.exports = apiRoute;
