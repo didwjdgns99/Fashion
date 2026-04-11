@@ -7,6 +7,7 @@ import {
 import { getProducts } from "@/libs/services/products";
 import Search from "@/app/components/search/search";
 import ScrollFix from "@/libs/hooks/useScrollFix";
+import Banner from "@/app/components/banner/banner";
 
 //next에서 params값을 page에 프롭스로 넘겨주기위해
 type ProductsPageProps = {
@@ -34,10 +35,12 @@ export default async function ProductsPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
+      <Banner />
       <div className="sticky top-0 z-10 bg-white  flex w-full ">
         <Search defaultValue={keyword} category={category} />
       </div>
       <ScrollFix />
+
       <div className="px-4 py-6 flex flex-col gap-4">
         <h3 className="font-bold">전체 상품</h3>
         <AllProducts keyword={keyword} category={category} />
