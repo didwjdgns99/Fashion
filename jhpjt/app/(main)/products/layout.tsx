@@ -9,7 +9,6 @@ export default function Layout({
 }) {
   return (
     <>
-      <div className="fixed top-2 left-2 z-[9999] text-white px-3 py-1"></div>
       {children}
       {modal}
     </>

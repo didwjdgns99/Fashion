@@ -1,4 +1,4 @@
-import "./globals.css";
+import "./../app/globals.css";
 import Providers from "./providers";
 import { Nanum_Gothic } from "next/font/google";
 import Header from "@/app/components/header/header";
@@ -18,7 +18,10 @@ export default function RootLayout({
     <html lang="ko">
       <body className={nanumGothic.className}>
         <div id="modal-root"></div>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
       </body>
     </html>
   );
