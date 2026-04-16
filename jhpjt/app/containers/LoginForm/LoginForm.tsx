@@ -7,7 +7,11 @@ import { useLogin } from "@/libs/hooks/useLogin";
 import { useRouter } from "next/navigation";
 import google from "@/public/image/google.png";
 
-export default function LoginForm() {
+type LoginFormProps = {
+  redirect: string;
+};
+
+export default function LoginForm({ redirect }: LoginFormProps) {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,7 +40,7 @@ export default function LoginForm() {
       {
         onSuccess: () => {
           alert("로그인성공");
-          router.push("/products");
+          router.replace(redirect);
         },
         onError: () => {
           alert("로그인실패");
