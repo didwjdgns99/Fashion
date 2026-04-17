@@ -1,4 +1,5 @@
 import "./../app/globals.css";
+import { Toaster } from "@/components/ui/sonner";
 import Providers from "./providers";
 import { Nanum_Gothic } from "next/font/google";
 import Header from "@/app/components/header/header";
@@ -20,6 +21,7 @@ export default function RootLayout({
         <div id="modal-root"></div>
         <Providers>
           <Header />
+          <Toaster position="top-center" richColors />
           {children}
         </Providers>
       </body>

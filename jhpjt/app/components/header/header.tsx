@@ -20,13 +20,15 @@ export default function Header() {
 
   return (
     <div className="flex justify-between items-center px-4 py-2 w-full h-[50px]">
-      <Image
-        src={Heading}
-        alt="헤더 이미지"
-        width={100}
-        height={34}
-        className="h-[30px]"
-      />
+      <Link href="/">
+        <Image
+          src={Heading}
+          alt="헤더 이미지"
+          width={100}
+          height={34}
+          className="h-[30px]"
+        />
+      </Link>
       <div className="flex gap-4">
         {user ? (
           <button>
