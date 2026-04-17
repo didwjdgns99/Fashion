@@ -2,9 +2,10 @@
 
 import Dropdown from "@/app/components/dropdown/Dropdown";
 import { ProductCardProps } from "@/./libs/types/products";
-import { useState } from "react";
+import { Children, useState } from "react";
 import { useCartStore } from "@/libs/store/cartStore";
 import { useRouter } from "next/navigation";
+import showToast from "@/lib/showToast";
 
 interface BotSheetProps {
   onClose: () => void;
@@ -18,7 +19,10 @@ export default function BotSheet({ product, onClose }: BotSheetProps) {
   const handleAddCart = () => {
     if (!product) return;
     if (!selectedSize) {
-      alert("사이즈를 선택해주세요.");
+      showToast({
+        type: "error",
+        children: "사이즈를 선택해주세요.",
+      });
       return;
     }
 
@@ -34,13 +38,16 @@ export default function BotSheet({ product, onClose }: BotSheetProps) {
     console.log("장바구니에 담을 값:", cartItem);
 
     addCart(cartItem);
+    showToast({
+      type: "success",
+      children: "장바구니에 추가됐습니다.",
+    });
     onClose();
   };
 
   const handleBuyProduct = () => {
     if (!product) return;
     if (!selectedSize) {
-      alert("사이즈를 선택해주세요.");
       return;
     }
 
@@ -76,13 +83,13 @@ export default function BotSheet({ product, onClose }: BotSheetProps) {
       </div>
       <button
         onClick={handleBuyProduct}
-        className="mt-3 w-full bg-black text-white py-3 rounded-xl pointer-cursor"
+        className="mt-3 w-full bg-black text-white py-3 rounded-xl cursor-pointer"
       >
         구매하기
       </button>
       <button
         onClick={handleAddCart}
-        className="mt-3 w-full bg-black text-white py-3 rounded-xl pointer-cursor"
+        className="mt-3 w-full bg-black text-white py-3 rounded-xl cursor-pointer"
       >
         장바구니 담기
       </button>
