@@ -13,7 +13,7 @@ type AvatarProps = {
 const sizeStyle = {
   sm: "w-[28px] h-[28px] text-xs",
   md: "w-8 h-8 text-sm",
-  lg: "w-12 h-12 text-base",
+  lg: "w-16 h-16",
 };
 
 export default function Avatar({
@@ -30,7 +30,7 @@ export default function Avatar({
       className={`
   relative overflow-hidden rounded-full
   flex items-center justify-center
-  bg-gray-400
+  bg-gray-800
   ${sizeStyle[size]}
   ${className}
 `}
