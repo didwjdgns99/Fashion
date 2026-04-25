@@ -29,3 +29,15 @@ async function seedProducts() {
 }
 
 seedProducts();
+//connet, deleteMany, insertMany, countDocuments 몽고DB 를 편하게 쓰기위한 mongoose가 제공하는 메서드
+//| 메서드             | 의미      |
+//| ----------------- | ------- |
+//| connect           | DB 연결   |
+//| find              | 데이터 조회  |
+//| findById          | id로 조회  |
+//| insertMany        | 여러 개 저장 |
+//| create            | 1개 저장   |
+//| deleteMany        | 여러 개 삭제 |
+//| findByIdAndDelete | 1개 삭제   |
+//| updateOne         | 수정      |
+//| countDocuments    | 개수 세기   |

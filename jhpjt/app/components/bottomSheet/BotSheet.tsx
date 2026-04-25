@@ -2,10 +2,11 @@
 
 import Dropdown from "@/app/components/dropdown/Dropdown";
 import { ProductCardProps } from "@/./libs/types/products";
-import { Children, useState } from "react";
+import { useState } from "react";
 import { useCartStore } from "@/libs/store/cartStore";
 import { useRouter } from "next/navigation";
 import showToast from "@/lib/showToast";
+import { addCartAction } from "@/app/actions/addCart.action";
 
 interface BotSheetProps {
   onClose: () => void;
@@ -14,10 +15,10 @@ interface BotSheetProps {
 
 export default function BotSheet({ product, onClose }: BotSheetProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const addCart = useCartStore((state) => state.addCart);
   const router = useRouter();
-  const handleAddCart = () => {
+  const handleAddCart = async () => {
     if (!product) return;
+
     if (!selectedSize) {
       showToast({
         type: "error",
@@ -26,41 +27,45 @@ export default function BotSheet({ product, onClose }: BotSheetProps) {
       return;
     }
 
-    const cartItem = {
+    const requestItem = {
       productId: product.id,
-      name: product.name,
-      price: product.price,
       size: selectedSize,
-      imageUrl: product.imageUrl,
       quantity: 1,
     };
 
-    console.log("장바구니에 담을 값:", cartItem);
+    const result = await addCartAction(requestItem);
 
-    addCart(cartItem);
+    // 서버가 populate해서 돌려준 최신 cart를 store에 반영
+    useCartStore.getState().setCartItems(result.cart.items);
+
     showToast({
       type: "success",
       children: "장바구니에 추가됐습니다.",
     });
+
     onClose();
   };
-
-  const handleBuyProduct = () => {
+  const handleBuyProduct = async () => {
     if (!product) return;
+
     if (!selectedSize) {
+      showToast({
+        type: "error",
+        children: "사이즈를 선택해주세요.",
+      });
       return;
     }
 
-    const cartItem = {
+    const requestItem = {
       productId: product.id,
-      name: product.name,
-      price: product.price,
       size: selectedSize,
-      imageUrl: product.imageUrl,
       quantity: 1,
     };
 
-    addCart(cartItem);
+    const result = await addCartAction(requestItem);
+
+    useCartStore.getState().setCartItems(result.cart.items);
+
     onClose();
     router.push("/cart");
   };

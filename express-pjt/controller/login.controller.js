@@ -1,7 +1,6 @@
 const { loginService, ERROR_MESSAGE } = require("../service/login.service");
 
 async function loginController(req, res) {
-  console.log("✅ loginController 들어옴");
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -11,7 +10,7 @@ async function loginController(req, res) {
       });
     }
 
-    const { userId, token } = await loginService({ email, password });
+    const { id, token } = await loginService({ email, password });
     //쿠키설정(이름 , 값 , 옵션)
     //브라우저에 "token" 이라는 쿠키를 저장해라 값은 JWT 토큰이다
     res.cookie("token", token, {
@@ -23,7 +22,8 @@ async function loginController(req, res) {
     return res.status(200).json({
       isError: false,
       message: "로그인 성공",
-      user: { id: userId },
+      user: { id },
+      token,
     });
   } catch (err) {
     // 4) 서비스 에러를 HTTP 에러로 변환 (컨트롤러 역할)

@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false,
+    default: null,
   },
   nickName: {
     type: String,
@@ -21,6 +22,10 @@ const userSchema = new mongoose.Schema({
     default: null, //디폴트 값
   },
   providerId: {
+    type: String,
+    default: null,
+  },
+  profileImage: {
     type: String,
     default: null,
   },
