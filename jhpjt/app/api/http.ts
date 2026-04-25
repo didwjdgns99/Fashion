@@ -29,6 +29,7 @@ export async function http(
 
   try {
     const res = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
       signal: controller.signal, //abort와 연결
       headers: {
         ...(options.body && { "Content-Type": DEFAULT_CONTENT_TYPE }),
@@ -38,7 +39,7 @@ export async function http(
         // 사용자가 직접 전달한 headers가 있으면 뒤에서 덮어씀
         // 즉, 사용자가 지정한 헤더가 우선권을 가짐
       },
-      ...options,
+      // ...options,
       // method, body, credentials 등 사용자가 전달한 fetch 옵션 적용
     });
 
@@ -51,7 +52,6 @@ export async function http(
       throw new ApiError(res.status, errorBody?.message || DEFAULT);
     }
     if (!isJson) {
-      console.log("JSON 응답 아님");
       return null;
     }
     //return await res.json();

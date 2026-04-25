@@ -4,8 +4,7 @@
 //없지만 이메일이 구글에서 준 데이터와 같다면 연동 => 구글 로그인 간으
 //있으면 이미 간편 로그인한 회원
 
-const { users } = require("../mocks/user.mock");
-const { randomUUID } = require("crypto");
+const User = require("../models/user.model");
 
 const OAUTH_ERROR_MESSAGE = {
   CODE_MISSING: "인가 코드가 없습니다.",
@@ -75,15 +74,16 @@ async function getGoogleUserInfo(accessToken) {
 async function findOrCreateGoogleUser(googleUser) {
   const { sub, email, name, picture } = googleUser;
 
-  let existUser = users.find(
-    (user) => user.provider === "google" && user.providerId === sub,
-  );
+  let existUser = await User.findOne({
+    provider: "google",
+    providerId: sub,
+  });
 
   if (existUser) {
     return existUser;
   }
 
-  const sameEmailUser = users.find((user) => user.email === email);
+  const sameEmailUser = await User.findOne({ email });
 
   if (sameEmailUser) {
     sameEmailUser.provider = "google";
@@ -93,20 +93,18 @@ async function findOrCreateGoogleUser(googleUser) {
     if (!sameEmailUser.nickName) {
       sameEmailUser.nickName = name || email.split("@")[0];
     }
+    await sameEmailUser.save();
     return sameEmailUser;
-  }
+  } //save는 특정상황에서 만 되도록 조건문
 
-  const newUser = {
-    id: randomUUID(),
+  const newUser = await User.create({
     email,
     nickName: name || email.split("@")[0],
     password: null,
     provider: "google",
     providerId: sub,
     profileImage: picture || null,
-  };
-
-  users.push(newUser);
+  });
 
   return newUser;
 }

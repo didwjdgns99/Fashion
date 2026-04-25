@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 const express = require("express"); //improt와 같은 서버 프레임워크 가져오기
-const cors = require("cors");
 const apiRoute = require("./routes");
 const app = express(); //app만들기 서버본체
 const loggerMiddleware = require("./middlewares/logger.middleware");

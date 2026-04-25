@@ -11,13 +11,13 @@ async function getMeController(req, res) {
 
     const decode = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await getMeService(decode.userId);
+    const user = await getMeService(decode.id);
 
     return res.status(200).json({
       message: "사용자 조회 성공",
       user: {
         id: user.id,
-        email: user.eamil,
+        email: user.email,
         nickName: user.nickName,
         profileImage: user.profileImage,
       },

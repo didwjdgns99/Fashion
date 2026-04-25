@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-// const { users } = require("../mocks/user.mock");
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt"); //비밀번호 저장 해싱 라이브러리
 
@@ -35,13 +34,13 @@ async function loginService({ email, password }) {
   }
 
   const token = jwt.sign(
-    { userId: user.id, email: user.email, nickName: user.nickName },
+    { id: user.id, email: user.email, nickName: user.nickName },
     secret,
     { expiresIn: "1h" },
   );
 
   return {
-    userId: user.id,
+    id: user.id,
     token,
   };
 }

@@ -23,8 +23,6 @@ async function getProducts({ size, cursor, keyword, category }) {
     .limit(size + 1) // hasNext확인
     .lean(); //몽구스 객체가 아닌 javascript 객체로 변환
 
-  console.log("조회된 items:", items);
-
   const hasNext = items.length > size; //item가져온 갯수가 size보다 크면 hasNext = true
 
   // 실제 반환할 데이터는 size개까지만

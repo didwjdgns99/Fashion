@@ -8,6 +8,7 @@ type AvatarProps = {
   name?: string;
   size?: AvatarSize;
   className?: string;
+  fallback?: string;
 };
 
 const sizeStyle = {

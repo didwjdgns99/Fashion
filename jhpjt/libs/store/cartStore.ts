@@ -1,11 +1,22 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type CartItem = {
-  productId: string;
-  imageUrl?: string;
-  name: string;
-  price: number;
+// export type CartItem = {
+//   productId: string;
+//   imageUrl?: string;
+//   name: string;
+//   price: number;
+//   size: string;
+//   quantity: number;
+// };
+
+export type CartItem = {
+  productId: {
+    _id: string;
+    name: string;
+    price: number;
+    imageUrl: string;
+  };
   size: string;
   quantity: number;
 };
@@ -16,12 +27,18 @@ type CartStore = {
   removeCart: (productId: string, size: string) => void;
   increaseQuantity: (productId: string, size: string) => void;
   decreaseQuantity: (productId: string, size: string) => void;
+  setCartItems: (items: CartItem[]) => void;
 };
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set) => ({
       cartItems: [],
+
+      setCartItems: (items) =>
+        set({
+          cartItems: items,
+        }),
 
       addCart: (item) =>
         set((state) => {
@@ -48,14 +65,14 @@ export const useCartStore = create<CartStore>()(
       removeCart: (productId, size) =>
         set((state) => ({
           cartItems: state.cartItems.filter(
-            (item) => !(item.productId === productId && item.size === size),
+            (item) => !(item.productId._id === productId && item.size === size),
           ),
         })),
       // 수량 증가
       increaseQuantity: (productId, size) =>
         set((state) => ({
           cartItems: state.cartItems.map((item) =>
-            item.productId === productId && item.size === size
+            item.productId._id === productId && item.size === size
               ? { ...item, quantity: item.quantity + 1 }
               : item,
           ),
@@ -65,7 +82,7 @@ export const useCartStore = create<CartStore>()(
       decreaseQuantity: (productId, size) =>
         set((state) => ({
           cartItems: state.cartItems.map((item) =>
-            item.productId === productId &&
+            item.productId._id === productId &&
             item.size === size &&
             item.quantity > 1
               ? { ...item, quantity: item.quantity - 1 }
