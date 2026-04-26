@@ -1,15 +1,14 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { getAuthCookie } from "@/libs/services/getCookies";
 
 export async function patchMyImageAction(formData: FormData) {
   try {
-    const cookiesStore = await cookies();
-    const token = cookiesStore.get("token")?.value;
+    const cookie = await getAuthCookie();
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/me`, {
       method: "PATCH",
-      headers: token ? { cookie: `token=${token}` } : {},
+      headers: cookie ? { Cookie: cookie } : {},
       body: formData,
       cache: "no-store",
     });

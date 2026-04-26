@@ -17,41 +17,46 @@ export type DeleteCartRequest = {
   size: string;
 };
 
-export function getCartApi(cookie?: string) {
-  return http("/api/cart", {
-    method: "GET",
-    headers: {
-      ...(cookie ? { Cookie: cookie } : {}),
+export function getCartApi() {
+  return http(
+    "/api/cart",
+    {
+      method: "GET",
     },
-  });
+    { authRequired: true },
+  );
 }
 
-export function addCartApi(payload: AddCartRequest, cookie?: string) {
-  return http("/api/cart", {
-    method: "POST",
-    headers: {
-      ...(cookie ? { Cookie: cookie } : {}),
+export function addCartApi(payload: AddCartRequest) {
+  return http(
+    "/api/cart",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+    { authRequired: true },
+  );
 }
 
-export function patchCartApi(payload: PatchCartRequest, cookie?: string) {
-  return http("/api/cart", {
-    method: "PATCH",
-    headers: {
-      ...(cookie ? { Cookie: cookie } : {}),
+export function patchCartApi(payload: PatchCartRequest) {
+  return http(
+    "/api/cart",
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+    { authRequired: true },
+  );
 }
 
-export function deleteCartApi(payload: DeleteCartRequest, cookie?: string) {
-  return http("/api/cart", {
-    method: "DELETE",
-    headers: {
-      ...(cookie ? { Cookie: cookie } : {}),
+export function deleteCartApi(payload: DeleteCartRequest) {
+  return http(
+    "/api/cart",
+    {
+      method: "DELETE",
+
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+    { authRequired: true },
+  );
 }
