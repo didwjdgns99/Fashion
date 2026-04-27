@@ -27,6 +27,7 @@ type CartStore = {
   removeCart: (productId: string, size: string) => void;
   increaseQuantity: (productId: string, size: string) => void;
   decreaseQuantity: (productId: string, size: string) => void;
+  setItemQuantity: (productId: string, size: string, quantity: number) => void;
   setCartItems: (items: CartItem[]) => void;
 };
 
@@ -44,13 +45,13 @@ export const useCartStore = create<CartStore>()(
         set((state) => {
           const existingItem = state.cartItems.find(
             (cartItem) =>
-              cartItem.productId === item.productId &&
+              cartItem.productId._id === item.productId._id &&
               cartItem.size === item.size,
           );
           if (existingItem) {
             return {
               cartItems: state.cartItems.map((cartItem) =>
-                cartItem.productId === item.productId &&
+                cartItem.productId._id === item.productId._id &&
                 cartItem.size === item.size
                   ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
                   : cartItem,
@@ -86,6 +87,15 @@ export const useCartStore = create<CartStore>()(
             item.size === size &&
             item.quantity > 1
               ? { ...item, quantity: item.quantity - 1 }
+              : item,
+          ),
+        })),
+
+      setItemQuantity: (productId, size, quantity) =>
+        set((state) => ({
+          cartItems: state.cartItems.map((item) =>
+            item.productId._id === productId && item.size === size
+              ? { ...item, quantity }
               : item,
           ),
         })),
