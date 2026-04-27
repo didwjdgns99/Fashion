@@ -8,9 +8,10 @@ import trash from "@/public/image/trash.svg";
 import EmptyCart from "../EmptyCart/EmptyCart";
 import { PatchCartAction } from "@/app/actions/patchCart.action";
 import type { CartItem } from "@/libs/store/cartStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { getCartAction } from "@/app/actions/getCart.action";
 import { deleteCartAction } from "@/app/actions/deleteCart.action";
+import { useDebounceCallback } from "@/libs/hooks/useDebounceCallback";
 
 export default function CartCard() {
   const items = useCartStore((state) => state.cartItems);
@@ -18,6 +19,11 @@ export default function CartCard() {
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
   const setCartItems = useCartStore((state) => state.setCartItems);
+  const setItemQuantity = useCartStore((state) => state.setItemQuantity);
+
+  const rollbackRef = useRef<Record<string, number>>({});
+
+  const quantityDebounce = useDebounceCallback(500);
   useEffect(() => {
     async function fetchCart() {
       try {
@@ -32,37 +38,56 @@ export default function CartCard() {
   }, [setCartItems]);
 
   const handleIncrease = async (item: CartItem) => {
-    try {
-      const newQuantity = item.quantity + 1;
+    const key = `${item.productId._id}-${item.size}`;
 
-      await PatchCartAction({
-        productId: item.productId._id,
-        size: item.size,
-        quantity: newQuantity,
-      });
-
-      increaseQuantity(item.productId._id, item.size);
-    } catch (error) {
-      console.error(error);
-      throw new Error("수량 변경 실패");
+    // 처음 클릭했을 때만 원래 수량 저장
+    if (rollbackRef.current[key] === undefined) {
+      rollbackRef.current[key] = item.quantity;
     }
+
+    const next = item.quantity + 1;
+    increaseQuantity(item.productId._id, item.size);
+    quantityDebounce(async () => {
+      try {
+        await PatchCartAction({
+          productId: item.productId._id,
+          size: item.size,
+          quantity: next,
+        });
+
+        delete rollbackRef.current[key];
+      } catch (error) {
+        console.error(error);
+        setItemQuantity(
+          item.productId._id,
+          item.size,
+          rollbackRef.current[key],
+        );
+
+        delete rollbackRef.current[key];
+      }
+    });
   };
 
   const handleDecrease = async (item: CartItem) => {
-    try {
-      const newQuantity = item.quantity - 1;
+    const prev = item.quantity;
+    const next = prev - 1;
 
-      await PatchCartAction({
-        productId: item.productId._id,
-        size: item.size,
-        quantity: newQuantity,
-      });
+    if (prev <= 1) return;
 
-      decreaseQuantity(item.productId._id, item.size);
-    } catch (error) {
-      console.error(error);
-      throw new Error("수량 변경 실패");
-    }
+    decreaseQuantity(item.productId._id, item.size);
+    quantityDebounce(async () => {
+      try {
+        await PatchCartAction({
+          productId: item.productId._id,
+          size: item.size,
+          quantity: next,
+        });
+      } catch (error) {
+        console.error(error);
+        setItemQuantity(item.productId._id, item.size, prev);
+      }
+    });
   };
 
   const handleDelete = async (item: CartItem) => {
