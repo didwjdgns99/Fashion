@@ -1,0 +1,11 @@
+const meRoute = require("express").Router();
+const { authMiddleware } = require("../middlewares/auth.middleware");
+const {
+  getMeController,
+  patchMeController,
+} = require("../controller/me.controller");
+const uploadMiddleware = require("../middlewares/upload.middleware");
+
+meRoute.get("/", authMiddleware, getMeController);
+meRoute.patch("/", authMiddleware, uploadMiddleware, patchMeController);
+module.exports = meRoute;

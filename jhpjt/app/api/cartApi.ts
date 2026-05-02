@@ -1,4 +1,5 @@
 import { http } from "@/app/api/http";
+import { API_ROUTES } from "@/app/utills/constants/api";
 
 export type AddCartRequest = {
   productId: string;
@@ -19,7 +20,7 @@ export type DeleteCartRequest = {
 
 export function getCartApi() {
   return http(
-    "/api/cart",
+    API_ROUTES.CART,
     {
       method: "GET",
     },
@@ -29,7 +30,7 @@ export function getCartApi() {
 
 export function addCartApi(payload: AddCartRequest) {
   return http(
-    "/api/cart",
+    API_ROUTES.CART,
     {
       method: "POST",
       body: JSON.stringify(payload),
@@ -40,7 +41,7 @@ export function addCartApi(payload: AddCartRequest) {
 
 export function patchCartApi(payload: PatchCartRequest) {
   return http(
-    "/api/cart",
+    API_ROUTES.CART,
     {
       method: "PATCH",
       body: JSON.stringify(payload),
@@ -51,7 +52,7 @@ export function patchCartApi(payload: PatchCartRequest) {
 
 export function deleteCartApi(payload: DeleteCartRequest) {
   return http(
-    "/api/cart",
+    API_ROUTES.CART,
     {
       method: "DELETE",
 

@@ -1,4 +1,5 @@
 import { http } from "@/app/api/http";
+import { API_ROUTES } from "@/app/utills/constants/api";
 
 export type SignupRequest = {
   email: string;
@@ -6,7 +7,7 @@ export type SignupRequest = {
 };
 
 export function signup(payload: SignupRequest) {
-  return http("/api/auth", {
+  return http(API_ROUTES.AUTH, {
     method: "POST",
     body: JSON.stringify(payload),
   });

@@ -1,6 +1,6 @@
 "use server";
 
-import { http } from "@/app/api/http";
+import { http, ApiError } from "@/app/api/http";
 
 type SignupPayload = {
   email: string;
@@ -23,11 +23,25 @@ export const postAuthAction = async ({
       }),
     });
 
-    console.log("회원가입 성공:", data);
-    return data;
+    return {
+      isError: false,
+      message: data.message ?? "회원가입이 완료되었습니다.",
+      data,
+    };
   } catch (error) {
-    console.error("postAuthAction 에러:", error);
-    throw error;
+    if (error instanceof ApiError) {
+      return {
+        isError: true,
+        status: error.status,
+        message: error.message ?? "회원가입에 실패했습니다.",
+      };
+    }
+
+    return {
+      isError: true,
+      status: 500,
+      message: "알 수 없는 오류가 발생했습니다.",
+    };
   }
 
   // if (!res.ok) {

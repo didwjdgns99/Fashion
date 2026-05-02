@@ -4,7 +4,7 @@ import { useCartStore } from "@/libs/store/cartStore";
 
 export default function CartBotSheet() {
   const items = useCartStore((state) => state.cartItems);
-
+  console.log(items);
   if (items.length === 0) return null;
   const productTotal = items.reduce(
     (sum, item) => sum + item.productId.price * item.quantity,

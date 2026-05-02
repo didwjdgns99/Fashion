@@ -10,7 +10,7 @@ const NEED_LOGIN = "로그인이 필요합니다.";
 //message 상속
 //extend Error로 stack, name 등도 상속
 //extend Error 하지 않으면 에러인척 하는 객체
-class ApiError extends Error {
+export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
     super(message);
@@ -36,7 +36,7 @@ export async function http(
 
   try {
     const cookie = await getAuthCookie();
-    //authReqired가 필요한데 쿠키가 없다면
+    //authRequired가 필요한데 쿠키가 없다면
     if (config.authRequired && !cookie) {
       throw new ApiError(401, NEED_LOGIN);
     }
@@ -51,7 +51,7 @@ export async function http(
           ? { "Content-Type": DEFAULT_CONTENT_TYPE }
           : {}),
         ...(cookie ? { Cookie: cookie } : {}),
-        ...options.headers,
+        ...options.headers, //호출하는곳에서 직접 넣은 헤더도 추가, 호출하는곳에서 기본 헤더를 덮어쓸수 있음
       },
     });
 
@@ -59,13 +59,14 @@ export async function http(
     const isJson = contentType.includes("application/json");
 
     // 응답 실패 처리
+    //서버에서 주는 에러
     if (!res.ok) {
       const errorBody = isJson
         ? await res.json().catch(() => null)
         : await res.text().catch(() => "");
       throw new ApiError(
         res.status,
-        typeof errorBody === "object" && errorBody?.message
+        typeof errorBody === "object" && errorBody?.message //express에서 객체로 에러메세지 보내주면 그걸 쓰고, 아니면 기본 메세지
           ? errorBody.message
           : DEFAULT,
       );

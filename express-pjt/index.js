@@ -11,6 +11,7 @@ const mongoose = require("mongoose");
 app.use(express.json()); //브라우저 에서 보낸 문자열을 객체로 변환
 app.use(express.urlencoded({ extended: true })); //폼을 받는 데이터를 객체로 변환 다른 타입 받으려면 별도 처리가 필요
 app.use(cookieParser());
+app.use("/upload", express.static("upload"));
 //loggerMiddleware를 먼저받고 next()를 썼으니까 apiRoute로 넘어감
 //토큰 유효성 확인 후 통과되면 next() 아니면 401보내기
 
