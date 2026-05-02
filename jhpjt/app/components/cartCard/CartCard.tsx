@@ -70,10 +70,13 @@ export default function CartCard() {
   };
 
   const handleDecrease = async (item: CartItem) => {
-    const prev = item.quantity;
-    const next = prev - 1;
+    const key = `${item.productId._id}-${item.size}`;
+    if (rollbackRef.current[key] === undefined) {
+      rollbackRef.current[key] = item.quantity;
+    }
+    const next = item.quantity - 1;
 
-    if (prev <= 1) return;
+    if (item.quantity <= 1) return;
 
     decreaseQuantity(item.productId._id, item.size);
     quantityDebounce(async () => {
@@ -85,7 +88,12 @@ export default function CartCard() {
         });
       } catch (error) {
         console.error(error);
-        setItemQuantity(item.productId._id, item.size, prev);
+        setItemQuantity(
+          item.productId._id,
+          item.size,
+          rollbackRef.current[key],
+        );
+        delete rollbackRef.current[key];
       }
     });
   };

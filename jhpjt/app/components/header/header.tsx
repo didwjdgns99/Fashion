@@ -18,6 +18,10 @@ export default function Header() {
     return null;
   }
 
+  const imageSrc = user?.profileImage
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${user.profileImage}`
+    : null;
+
   return (
     <div className="flex justify-between items-center px-4 py-2 w-full h-[50px]">
       <Link href="/">
@@ -31,14 +35,16 @@ export default function Header() {
       </Link>
       <div className="flex gap-4">
         {user ? (
-          <button>
-            <Avatar
-              src={user.profileImage}
-              name={user.nickName}
-              size="sm"
-              className="font-bold text-white cursor-pointer"
-            />
-          </button>
+          <Link href="/mypage">
+            <button>
+              <Avatar
+                src={imageSrc ?? undefined}
+                name={user.nickName}
+                size="sm"
+                className="font-bold text-white cursor-pointer"
+              />
+            </button>
+          </Link>
         ) : (
           <Link href="/login" className="text-sm font-semibold cursor-pointer">
             로그인

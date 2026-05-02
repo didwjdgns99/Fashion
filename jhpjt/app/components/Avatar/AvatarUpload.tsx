@@ -4,26 +4,39 @@ import Avatar from "./Avatar";
 import fillCamera from "@/public/image/fillCamera.svg";
 import Image from "next/image";
 import usePatchMyImage from "@/libs/hooks/usePatchMyImage";
+import UserModal from "../userModal/userModal";
+// import { userImage } from "@/public/image/userImage.svg";
 
 type AvatarUploadProps = {
-  initialImage: string;
+  imageSrc: string | null;
   fallbackText: string;
 };
 
 export default function AvatarUpload({
-  initialImage,
+  imageSrc,
   fallbackText,
 }: AvatarUploadProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(
-    initialImage ?? null,
+    imageSrc ?? null,
   );
+  const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { mutate, isPending } = usePatchMyImage();
 
   const handleClick = () => {
-    inputRef.current?.click();
+    // inputRef.current?.click();
+    setIsOpen(true);
   };
+
+  // const defaultConfirmClick = () => {
+  //   setIsOpen(false);
+  //   setPreviewImage(userImage.src);
+
+  //   const formData = new FormData();
+  //   formData.append("profileImage", new Blob());
+  //   mutate(formData);
+  // };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,6 +72,26 @@ export default function AvatarUpload({
         onChange={handleChange}
         disabled={isPending}
       />
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setIsOpen(false)}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <UserModal
+              onConfirm={() => setIsOpen(false)}
+              text="기본이미지로 변경"
+              onConfirm2={() => {
+                setIsOpen(false);
+                inputRef.current?.click();
+              }}
+              text2="내 이미지로 변경"
+            >
+              프로필 이미지를 선택하세요.
+            </UserModal>
+          </div>
+        </div>
+      )}
     </>
   );
 }

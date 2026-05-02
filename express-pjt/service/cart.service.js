@@ -3,7 +3,7 @@ const Product = require("../models/product.model");
 
 async function getPopulatedCart(userId) {
   let cart = await Cart.findOne({ userId }).populate(
-    "items.productId",
+    "items.productId", //어디에 채울지
     "name price imageUrl",
   );
 

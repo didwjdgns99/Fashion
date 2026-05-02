@@ -1,4 +1,5 @@
 import { http } from "@/app/api/http";
+import { API_ROUTES } from "@/app/utills/constants/api";
 
 export type LoginRequest = {
   email: string;
@@ -6,7 +7,7 @@ export type LoginRequest = {
 };
 
 export function login(payload: LoginRequest) {
-  return http("/api/login", {
+  return http(API_ROUTES.lOGIN, {
     method: "POST",
     credentials: "include",
     body: JSON.stringify(payload),

@@ -113,7 +113,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
                   />
 
                   <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <UserModal onConfirm={handleLoginMove}>
+                    <UserModal onConfirm={handleLoginMove} text="확인">
                       로그인이 필요합니다.
                     </UserModal>
                   </div>
