@@ -38,4 +38,22 @@ async function patchMeService(userId, file) {
   return updateUser;
 }
 
-module.exports = { getMeService, patchMeService };
+async function deleteMeService(userId) {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    const err = new Error("프로필 삭제 할 유저를 찾을 수 없습니다.");
+    err.status = 404;
+    throw err;
+  }
+
+  const deletedUser = await User.findByIdAndUpdate(
+    userId,
+    { profileImage: null },
+    { new: true },
+  );
+
+  return deletedUser;
+}
+
+module.exports = { getMeService, patchMeService, deleteMeService };

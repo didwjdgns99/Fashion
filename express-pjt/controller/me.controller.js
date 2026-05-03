@@ -1,4 +1,8 @@
-const { getMeService, patchMeService } = require("../service/me.service");
+const {
+  getMeService,
+  patchMeService,
+  deleteMeService,
+} = require("../service/me.service");
 
 async function getMeController(req, res) {
   try {
@@ -29,8 +33,6 @@ async function getMeController(req, res) {
 }
 
 async function patchMeController(req, res) {
-  console.log("req.file:", req.file);
-  console.log("req.body:", req.body);
   try {
     const updatedUser = await patchMeService(req.userId, req.file);
 
@@ -54,4 +56,27 @@ async function patchMeController(req, res) {
   }
 }
 
-module.exports = { getMeController, patchMeController };
+async function deleteMeController(req, res) {
+  try {
+    const user = await deleteMeService(req.userId);
+
+    return res.status(200).json({
+      isError: false,
+      message: "프로필 이미지 삭제 성공",
+      user: {
+        id: user._id,
+        email: user.email,
+        nickName: user.nickName,
+        profileImage: user.profileImage,
+      },
+    });
+  } catch (error) {
+    console.error("deleteMeController error:", error);
+
+    return res.status(error.status || 500).json({
+      isError: true,
+      message: error.message || "프로필 이미지 삭제 실패",
+    });
+  }
+}
+module.exports = { getMeController, patchMeController, deleteMeController };
