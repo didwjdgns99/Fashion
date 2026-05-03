@@ -5,6 +5,7 @@ import fillCamera from "@/public/image/fillCamera.svg";
 import Image from "next/image";
 import usePatchMyImage from "@/libs/hooks/usePatchMyImage";
 import UserModal from "../userModal/userModal";
+import imageCompression from "browser-image-compression";
 // import { userImage } from "@/public/image/userImage.svg";
 
 type AvatarUploadProps = {
@@ -38,16 +39,27 @@ export default function AvatarUpload({
   //   mutate(formData);
   // };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const url = URL.createObjectURL(file);
+    if (previewImage?.startsWith("blob:")) {
+      //미리보기 이미지는 blob URL로 생성되므로, 이전에 생성된 blob URL이 있다면 해제
+      URL.revokeObjectURL(previewImage);
+    }
     setPreviewImage(url);
+
+    //imageCompression 에서 await을 쓰는이유 => 압축이 완료될 때까지 기다려야 하기 때문, 압축이 완료된 후에 formData에 추가해서 서버로 보내야 함
+    const compressImage = await imageCompression(file, {
+      maxSizeMB: 0.5,
+      maxWidthOrHeight: 500, //가로세로 중 넓은 쪽을 비율에 맞게 최대 500px로 줄이겠다.
+      useWebWorker: true, // 압축 작업을 메인스레드가 아닌 webWorker에서 실행 => UI안 끊김, 버튼 스크롤 부드럽게 유지
+    });
 
     const formData = new FormData();
 
-    formData.append("profileImage", file);
+    formData.append("profileImage", compressImage);
     mutate(formData);
   };
 

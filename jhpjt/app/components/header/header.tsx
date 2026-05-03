@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 
 export default function Header() {
   const { data } = useUser();
+  console.log("data:", data);
   const pathname = usePathname();
   const user = data?.user;
 
@@ -22,6 +23,9 @@ export default function Header() {
     ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${user.profileImage}`
     : null;
 
+  // const imageSrc = user?.profileImage ?? null;
+
+  console.log("imageSrc:", imageSrc);
   return (
     <div className="flex justify-between items-center px-4 py-2 w-full h-[50px]">
       <Link href="/">
