@@ -3,9 +3,10 @@ import { useState, useRef } from "react";
 import Avatar from "./Avatar";
 import fillCamera from "@/public/image/fillCamera.svg";
 import Image from "next/image";
-import usePatchMyImage from "@/libs/hooks/usePatchMyImage";
+import { usePatchMyImage, useDeleteMyImage } from "@/libs/hooks/useMyImage";
 import UserModal from "../userModal/userModal";
 import imageCompression from "browser-image-compression";
+import { useUser } from "@/libs/hooks/useUser";
 // import { userImage } from "@/public/image/userImage.svg";
 
 type AvatarUploadProps = {
@@ -17,27 +18,31 @@ export default function AvatarUpload({
   imageSrc,
   fallbackText,
 }: AvatarUploadProps) {
+  const { data } = useUser();
+  const user = data?.user;
   const [previewImage, setPreviewImage] = useState<string | null>(
     imageSrc ?? null,
   );
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { mutate, isPending } = usePatchMyImage();
-
+  const { mutate: patchMutate, isPending: patchIsPending } = usePatchMyImage();
+  const { mutate: deleteMutate, isPending: deleteIsPending } =
+    useDeleteMyImage();
   const handleClick = () => {
     // inputRef.current?.click();
     setIsOpen(true);
   };
 
-  // const defaultConfirmClick = () => {
-  //   setIsOpen(false);
-  //   setPreviewImage(userImage.src);
+  const handleDelete = () => {
+    setIsOpen(false);
 
-  //   const formData = new FormData();
-  //   formData.append("profileImage", new Blob());
-  //   mutate(formData);
-  // };
+    if (previewImage?.startsWith("blob:")) {
+      URL.revokeObjectURL(previewImage);
+    }
+    setPreviewImage(null);
+    deleteMutate();
+  };
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,7 +65,7 @@ export default function AvatarUpload({
     const formData = new FormData();
 
     formData.append("profileImage", compressImage);
-    mutate(formData);
+    patchMutate(formData);
   };
 
   return (
@@ -68,6 +73,7 @@ export default function AvatarUpload({
       <div className="relative cursor-pointer" onClick={handleClick}>
         <Avatar
           size="lg"
+          name={user.nickName}
           src={previewImage ?? undefined}
           fallback={fallbackText}
           className="text-white text-2xl border border-gray-600"
@@ -82,7 +88,7 @@ export default function AvatarUpload({
         accept="image/*"
         hidden
         onChange={handleChange}
-        disabled={isPending}
+        disabled={patchIsPending || deleteIsPending}
       />
       {isOpen && (
         <div
@@ -91,7 +97,7 @@ export default function AvatarUpload({
         >
           <div onClick={(e) => e.stopPropagation()}>
             <UserModal
-              onConfirm={() => setIsOpen(false)}
+              onConfirm={handleDelete}
               text="기본이미지로 변경"
               onConfirm2={() => {
                 setIsOpen(false);
