@@ -47,7 +47,29 @@ async function googleOAuthCallback(req, res) {
   }
 }
 
+function googleLogoutController(req, res) {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+    });
+
+    return res.status(200).json({
+      isError: false,
+      message: "로그아웃 성공",
+    });
+  } catch (error) {
+    console.error("logoutController error", error);
+    return res.status(500).json({
+      isError: true,
+      message: "로그아웃 실패",
+    });
+  }
+}
+
 module.exports = {
   googleOAuthStart,
   googleOAuthCallback,
+  googleLogoutController,
 };

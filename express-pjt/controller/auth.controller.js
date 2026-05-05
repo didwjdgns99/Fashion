@@ -1,4 +1,8 @@
-const { loginService, ERROR_MESSAGE } = require("../service/login.service");
+const {
+  loginService,
+  ERROR_MESSAGE,
+  logoutService,
+} = require("../service/auth.service");
 
 async function loginController(req, res) {
   try {
@@ -51,4 +55,21 @@ async function loginController(req, res) {
   }
 }
 
-module.exports = { loginController };
+//DB작업 없음 => async 안붙여도됨
+function logoutController(req, res) {
+  try {
+    logoutService(res);
+    return res.status(200).json({
+      isError: false,
+      message: "로그아웃 성공",
+    });
+  } catch (error) {
+    console.error("logoutController error:", error);
+    return res.status(500).json({
+      isError: true,
+      message: "로그아웃 실패",
+    });
+  }
+}
+
+module.exports = { loginController, logoutController };

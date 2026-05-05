@@ -44,5 +44,17 @@ async function loginService({ email, password }) {
     token,
   };
 }
+function logoutService(res) {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+  });
 
-module.exports = { loginService, ERROR_MESSAGE };
+  return {
+    isError: false,
+    message: "로그아웃 성공",
+  };
+}
+
+module.exports = { loginService, logoutService, ERROR_MESSAGE };

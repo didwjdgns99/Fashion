@@ -12,11 +12,13 @@ import { useUser } from "@/libs/hooks/useUser";
 type AvatarUploadProps = {
   imageSrc: string | null;
   fallbackText: string;
+  nickName: string;
 };
 
 export default function AvatarUpload({
   imageSrc,
   fallbackText,
+  nickName,
 }: AvatarUploadProps) {
   const { data } = useUser();
   const user = data?.user;
@@ -73,7 +75,7 @@ export default function AvatarUpload({
       <div className="relative cursor-pointer" onClick={handleClick}>
         <Avatar
           size="lg"
-          name={user.nickName}
+          name={nickName}
           src={previewImage ?? undefined}
           fallback={fallbackText}
           className="text-white text-2xl border border-gray-600"
