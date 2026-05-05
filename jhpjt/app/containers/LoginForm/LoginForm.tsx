@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useLogin } from "@/libs/hooks/useLogin";
 import { useRouter } from "next/navigation";
 import google from "@/public/image/google.png";
+import showToast from "@/lib/showToast";
 
 type LoginFormProps = {
   redirect: string;
@@ -39,11 +40,17 @@ export default function LoginForm({ redirect }: LoginFormProps) {
 
       {
         onSuccess: () => {
-          alert("로그인성공");
+          showToast({
+            type: "success",
+            children: "로그인 성공",
+          });
           router.replace(redirect);
         },
         onError: () => {
-          alert("로그인실패");
+          showToast({
+            type: "error",
+            children: "로그인 실패. 이메일과 비밀번호를 확인해주세요.",
+          });
         },
       },
     );

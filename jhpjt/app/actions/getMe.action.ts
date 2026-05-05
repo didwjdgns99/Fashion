@@ -1,17 +1,22 @@
 "use server";
-import { http } from "@/app/api/http";
-import { getAuthCookie } from "@/libs/services/getCookies";
+import { http, ApiError } from "@/app/api/http";
 
 export const getMeAction = async () => {
   try {
-    const cookie = await getAuthCookie();
-
-    return await http("/api/me", {
-      method: "GET",
-      headers: cookie ? { cookie } : {},
-    });
+    return await http(
+      "/api/me",
+      {
+        method: "GET",
+      },
+      { authRequired: true },
+    );
   } catch (error) {
-    console.error("getMeAction error:", error);
-    throw error;
+    if (error instanceof ApiError) {
+      return {
+        isError: true,
+        status: error.status,
+        message: error.message ?? "유저 정보를 가져오는데 실패했습니다.",
+      };
+    }
   }
 };

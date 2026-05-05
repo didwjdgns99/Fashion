@@ -1,6 +1,7 @@
 "use server";
 import { http } from "@/app/api/http";
 import { cookies } from "next/headers";
+import { API_ROUTES } from "@/app/utills/constants/api";
 
 type LoginPayload = {
   email: string;
@@ -9,7 +10,7 @@ type LoginPayload = {
 
 export const postLoginAction = async ({ email, password }: LoginPayload) => {
   try {
-    const result = await http("/api/login", {
+    const result = await http(API_ROUTES.LOGIN, {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
