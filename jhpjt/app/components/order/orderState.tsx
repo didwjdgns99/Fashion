@@ -1,4 +1,4 @@
-type OrderState = "결제완료" | "배송중" | "배송완료" | "취소/반품";
+export type OrderState = "결제완료" | "배송중" | "배송완료" | "반품/교환";
 
 type OrderStateItem = {
   state: OrderState;
