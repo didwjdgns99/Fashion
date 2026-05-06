@@ -1,6 +1,7 @@
 import MyInfo from "../../components/MyInfo/MyInfo";
 import OrderState from "@/app/components/order/orderState";
 import Logout from "@/app/components/Logout/Logout";
+import RecentOrder from "@/app/components/order/recentOrder";
 
 export default function MyPage() {
   return (
@@ -11,9 +12,13 @@ export default function MyPage() {
           { state: "결제완료", orderQuantity: 2 },
           { state: "배송중", orderQuantity: 1 },
           { state: "배송완료", orderQuantity: 3 },
-          { state: "취소/반품", orderQuantity: 0 },
+          { state: "반품/교환", orderQuantity: 0 },
         ]}
       />
+      <div className="flex flex-col gap-4 p-5 bg-white">
+        <h3>최근 주문내역</h3>
+        <RecentOrder />
+      </div>
       <Logout />
     </div>
   );

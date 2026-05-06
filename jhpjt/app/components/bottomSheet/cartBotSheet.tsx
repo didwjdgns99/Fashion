@@ -1,6 +1,7 @@
 "use client";
 
 import { useCartStore } from "@/libs/store/cartStore";
+import { loadTossPayments } from "@tosspayments/payment-sdk";
 
 export default function CartBotSheet() {
   const items = useCartStore((state) => state.cartItems);
@@ -10,6 +11,13 @@ export default function CartBotSheet() {
     (sum, item) => sum + item.productId.price * item.quantity,
     0,
   );
+
+  const handlePay = async () => {
+    const tossPayments = await loadTossPayments(
+      process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!,
+    );
+  };
+
   return (
     <div className="flex flex-col fixed bottom-0 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] left-0 w-full px-4 h-50 items-center flex">
       <div className="w-full px-4 mb-4 pt-4">
