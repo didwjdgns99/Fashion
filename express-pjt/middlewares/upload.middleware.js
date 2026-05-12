@@ -48,8 +48,12 @@ function uploadMiddleware(req, res, next) {
 
     const ext = path.extname(req.file.originalname); //path는 extname이라는 기능이 있어서 파일의 확장자를 추출할 수 있다. 원래 파일이름에서 확장자만 추출해서 ext에 저장한다.
 
-    const fileName = `${hash}${ext}`;
+    console.log("originalname:", req.file.originalname);
+    console.log("mimetype:", req.file.mimetype);
+    console.log("ext:", ext);
 
+    const fileName = `${hash}${ext}`;
+    console.log("fileName:", fileName);
     const filePath = path.join(uploadDir, fileName); //join도 마찬가지
 
     if (!fs.existsSync(filePath)) {
