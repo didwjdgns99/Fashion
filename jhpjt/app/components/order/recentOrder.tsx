@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { OrderState } from "./orderState";
+// import { OrderState } from "./orderState";
 
 type orderBadge = "상품 준비중" | "배송중" | "배송완료" | "주문취소";
 

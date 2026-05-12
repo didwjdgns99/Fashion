@@ -14,7 +14,7 @@ const blockedBots = [
 
 function botMiddleware(req, res, next) {
   const userAgent = req.headers["user-agent"] || ""; //헤더스에 담긴 user-agent를 보고 사용자인지 봇인지 판단, 없을수가 없지만 혹시나 없으면 빈문자열
-
+  console.log(process.env.NODE_ENV);
   const isBot = blockedBots.some((botName) =>
     userAgent.toLowerCase().includes(botName.toLowerCase()),
   );

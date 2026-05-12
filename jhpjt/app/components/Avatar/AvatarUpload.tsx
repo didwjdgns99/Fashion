@@ -66,7 +66,7 @@ export default function AvatarUpload({
 
     const formData = new FormData();
 
-    formData.append("profileImage", compressImage);
+    formData.append("profileImage", compressImage, file.name);
     patchMutate(formData);
   };
 

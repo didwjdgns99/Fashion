@@ -8,9 +8,10 @@ const cookieParser = require("cookie-parser");
 const limiter = require("./middlewares/rateLimit.middleware");
 const mongoose = require("mongoose");
 const botMiddleware = require("./middlewares/bot.middleware");
-// const helmet = require("helmet");
+const { cleanupPendingOrders } = require("./service/orderCleanup.service");
+const helmet = require("helmet");
 
-// app.use(helmet());
+app.use(helmet());
 
 app.use(express.json()); //브라우저 에서 보낸 문자열을 객체로 변환
 app.use(express.urlencoded({ extended: true })); //폼을 받는 데이터를 객체로 변환 다른 타입 받으려면 별도 처리가 필요
@@ -22,7 +23,20 @@ app.use("/upload", express.static("upload"));
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB 연결 성공"))
+  .then(() => {
+    console.log("MongoDB 연결 성공");
+
+    setInterval(
+      async () => {
+        try {
+          await cleanupPendingOrders();
+        } catch (error) {
+          console.error("주문 정리 실패:", error);
+        }
+      },
+      1000 * 60 * 10,
+    );
+  })
   .catch((err) => console.error("MongoDB 연결 실패", err));
 
 app.use("/api", botMiddleware, loggerMiddleware, apiRoute);

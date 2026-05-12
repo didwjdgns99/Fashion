@@ -23,3 +23,4 @@ export function useDebounceCallback(delay: number = 500) {
   }, []);
   return debounce;
 }
+//클린업 함수 빼서 함수호출
