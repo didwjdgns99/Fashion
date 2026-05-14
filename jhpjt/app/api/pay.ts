@@ -11,8 +11,16 @@ export async function confirmPaymentApi(data: {
   orderId: string;
   amount: number;
 }): Promise<ConfirmPaymentResponse> {
-  return http("/api/payment/confirm", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  return http(
+    "/api/payment/confirm",
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    },
+    {
+      authRequired: true,
+    },
+  );
 }
+
+export async function failPaymentApi() {}

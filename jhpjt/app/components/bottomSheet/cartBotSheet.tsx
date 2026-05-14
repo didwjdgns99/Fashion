@@ -30,6 +30,20 @@ export default function CartBotSheet() {
         return;
       }
 
+      if (
+        !result.order?.amount ||
+        !result.order?.orderId ||
+        !result.order?.orderName
+      ) {
+        console.log("토스 필수값 없음:", result);
+
+        showToast({
+          type: "error",
+          children: "결제에 필요한 주문 정보가 없습니다.",
+        });
+        return;
+      }
+
       // 3. 토스 결제 객체 불러오기
       const tossPayments = await loadTossPayments(
         process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!,
@@ -43,10 +57,6 @@ export default function CartBotSheet() {
         successUrl: `${window.location.origin}/pay/success`,
         failUrl: `${window.location.origin}/pay/fail`,
       });
-      if (!result.amount || !result.orderId || !result.orderName) {
-        console.log("토스 필수값 없음:", result);
-        return;
-      }
     } catch (error) {
       console.error("결제 에러:", error);
 
@@ -58,7 +68,7 @@ export default function CartBotSheet() {
   };
 
   return (
-    <div className="flex flex-col fixed bottom-0 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] left-0 w-full px-4 h-50 items-center flex">
+    <div className="flex flex-col fixed bottom-0 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] left-0 w-full px-4 h-50 items-center">
       <div className="w-full px-4 mb-4 pt-4">
         <div className="flex flex-col gap-2">
           <div className="flex justify-between">

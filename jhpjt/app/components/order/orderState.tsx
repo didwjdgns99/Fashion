@@ -1,15 +1,54 @@
-export type OrderState = "결제완료" | "배송중" | "배송완료" | "반품/교환";
+"use client";
 
-type OrderStateItem = {
-  state: OrderState;
-  orderQuantity: number;
-};
+import { useGetOrders } from "@/libs/hooks/useGetOrders";
+export type OrderState = "결제완료" | "배송중" | "배송완료" | "반품/취소";
 
-type OrderStateProps = {
-  states: OrderStateItem[];
-};
+export default function OrderState() {
+  const { data, isPending, isError } = useGetOrders();
 
-export default function OrderState({ states }: OrderStateProps) {
+  console.log("OrderState 실행됨");
+  console.log("data:", data);
+  console.log("isPending:", isPending);
+  console.log("isError:", isError);
+
+  if (isPending) {
+    return <div>주문 상태 불러오는 중...</div>;
+  }
+
+  if (isError || data?.isError) {
+    return <div>주문 상태를 불러오지 못했습니다.</div>;
+  }
+
+  const orders = data?.orders ?? [];
+
+  const paidCount = orders.filter(
+    (order) => order.orderStatus === "결제완료",
+  ).length;
+
+  // 배송중 개수
+  const shippingCount = orders.filter(
+    (order) => order.deliveryStatus === "배송중",
+  ).length;
+
+  // 배송완료 개수
+  const deliveredCount = orders.filter(
+    (order) => order.deliveryStatus === "배송완료",
+  ).length;
+
+  // 반품/교환 개수
+  const canceledCount = orders.filter(
+    (order) => order.orderStatus === "반품/취소",
+  ).length;
+
+  console.log("데이타입니다아다다닫 ", data);
+
+  const states = [
+    { state: "결제완료", orderQuantity: paidCount },
+    { state: "배송중", orderQuantity: shippingCount },
+    { state: "배송완료", orderQuantity: deliveredCount },
+    { state: "반품/취소", orderQuantity: canceledCount },
+  ];
+
   return (
     <div className="flex flex-col gap-4 px-8 bg-white py-4">
       <h3 className="font-bold text-md">주문 배송</h3>

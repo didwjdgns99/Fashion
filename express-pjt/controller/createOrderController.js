@@ -1,4 +1,7 @@
-const { createOrderService } = require("../service/createOrderService");
+const {
+  createOrderService,
+  getOrderService,
+} = require("../service/createOrderService");
 
 async function createOrderController(req, res) {
   try {
@@ -19,6 +22,26 @@ async function createOrderController(req, res) {
   }
 }
 
+async function getOrderController(req, res) {
+  try {
+    const orders = await getOrderService(req.userId);
+
+    return res.status(201).json({
+      isError: false,
+      message: "주문 조회 성공",
+      orders,
+    });
+  } catch (error) {
+    console.error("getOrderController", error);
+
+    return res.status(error.status || 500).json({
+      isError: true,
+      message: error.message || "주문 조회 실패",
+    });
+  }
+}
+
 module.exports = {
   createOrderController,
+  getOrderController,
 };

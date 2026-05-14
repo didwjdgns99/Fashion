@@ -8,17 +8,22 @@ type ToastType = "default" | "success" | "error";
 interface ShowToast {
   type?: ToastType;
   children: ReactNode;
+  duration?: number;
 }
 
-export default function showToast({ type = "default", children }: ShowToast) {
+export default function showToast({
+  type = "default",
+  children,
+  duration = 1500,
+}: ShowToast) {
   switch (type) {
     case "success":
-      toast.success(children);
+      toast.success(children, { duration });
       break;
     case "error":
-      toast.error(children);
+      toast.error(children, { duration });
       break;
     default:
-      toast(children);
+      toast(children, { duration });
   }
 }
