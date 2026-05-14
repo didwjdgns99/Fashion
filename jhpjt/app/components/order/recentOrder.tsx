@@ -1,70 +1,76 @@
+"use client";
+
 import Image from "next/image";
-// import { OrderState } from "./orderState";
+import { useGetOrders } from "@/libs/hooks/useGetOrders";
 
-type orderBadge = "상품 준비중" | "배송중" | "배송완료" | "주문취소";
+function getBadgeStyle(status?: string) {
+  switch (status) {
+    case "상품 준비중":
+      return "bg-blue-400 text-white";
+    case "배송중":
+      return "bg-violet-400 text-white";
+    case "배송완료":
+      return "bg-green-400 text-white";
+    case "반품/취소":
+      return "bg-red-400 text-white";
+    default:
+      return "bg-gray-300 text-black";
+  }
+}
 
-type RecentOrderProps = {
-  orderBadge?: orderBadge;
-  orderDate?: string;
-  orderCode?: string;
-  imageList?: string[] | undefined;
-  totalPrice?: string;
-  orderQuantity?: number;
-};
-
-const stateStyleMap: Record<orderBadge, string> = {
-  "상품 준비중": "bg-blue-400 text-white",
-  배송중: "bg-violet-400 text-white",
-  배송완료: "bg-green-400 text-white",
-  주문취소: "bg-red-400 text-white",
-};
-
-export default function RecentOrder({
-  orderBadge = "배송중",
-  orderDate = "2026.05.06",
-  orderCode = "123456789",
-  imageList = [],
-  totalPrice = "10000",
-  orderQuantity = 1,
-}: RecentOrderProps) {
-  const badgeStyle = stateStyleMap[orderBadge];
-
+export default function RecentOrder() {
+  const { data } = useGetOrders();
+  if (!data?.orders.length) {
+    return <div>주문 내역이 없습니다.</div>;
+  }
   return (
-    <>
-      <div className="border p-3 rounded-xl">
-        <div className="flex justify-between items-start ">
-          <div className="flex flex-col gap-2">
-            <span className="text-xs text-gray-500">{orderDate}</span>
-            <span className="text-[15px] font-medium">
-              주문번호: {orderCode}
+    <div className="h-100 overflow-hidden overflow-y-auto flex flex-col gap-2">
+      {data?.orders?.slice(0, 5).map((order) => (
+        <div
+          key={order.orderId}
+          className="border p-3 rounded-xl flex flex-col gap-2"
+        >
+          <div className="flex justify-between items-start ">
+            <div className="flex flex-col gap-2">
+              <span className="text-xs text-gray-500 font-bold">
+                {order.createdAt?.split("T")[0]}
+              </span>
+              <span className="text-[15px] font-medium">
+                주문번호: {order.orderId}
+              </span>
+            </div>
+            <span
+              className={`text-[11px] font-medium px-2 py-1 rounded-xl  ${getBadgeStyle(
+                order.deliveryStatus,
+              )}`}
+            >
+              {order.deliveryStatus}
             </span>
           </div>
-          <span
-            className={`text-[14px] font-medium px-2 py-1 rounded-xl ${badgeStyle}`}
-          >
-            {orderBadge}
-          </span>
+          <div>
+            <div key={order.orderId} className="flex gap-4">
+              {order.items.map((item) => (
+                <Image
+                  key={item.productId}
+                  src={item.imageUrl}
+                  alt={item.name}
+                  width={100}
+                  height={100}
+                  className="w-25 h-25 object-cover rounded-sm"
+                />
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-between border-t-1  py-2">
+            <span className="text-[15px] text-black font-bold">
+              총 {order.items.length} 개의 상품
+            </span>
+            <span className=" font-semibold">
+              {order.totalPrice.toLocaleString()} 원
+            </span>
+          </div>
         </div>
-        <div>
-          {imageList.map((src, index) => (
-            <Image
-              key={index}
-              src={src}
-              alt={`상품 이미지${index + 1}`}
-              width={64}
-              height={64}
-            />
-          ))}
-        </div>
-        <div className="flex justify-between border-t-1  py-4">
-          <span className="text-[15px] text-gray-500">
-            총 {orderQuantity}개 상품
-          </span>
-          <span className=" font-semibold">
-            {totalPrice.toLocaleString()} 원
-          </span>
-        </div>
-      </div>
-    </>
+      ))}
+    </div>
   );
 }
