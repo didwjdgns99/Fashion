@@ -2,10 +2,19 @@
 
 import Image from "next/image";
 import paysuccess from "@/public/image/paysuccess.svg";
-import RecentOrder from "@/app/components/order/recentOrder";
+import SuccessCard from "@/app/pay/success/successCard";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import confirmPaymentAction from "@/app/actions/confirmPayment.action";
+import { Order } from "@/app/api/pay";
+import { Payment } from "@/libs/types/payment";
+type ConfirmPaymentResult = {
+  isError: boolean;
+  payment?: Payment;
+  message: string;
+  status?: number;
+  order?: Order;
+};
 
 export default function SuccessPage() {
   const router = useRouter();
@@ -16,7 +25,7 @@ export default function SuccessPage() {
   const amount = searchParams.get("amount");
 
   const [isConfirmed, setIsConfirmed] = useState(false);
-
+  const [orderData, setOrderData] = useState<ConfirmPaymentResult | null>(null);
   useEffect(() => {
     const confirm = async () => {
       try {
@@ -35,6 +44,8 @@ export default function SuccessPage() {
           router.replace("/pay/fail");
           return;
         }
+
+        setOrderData(result);
 
         setIsConfirmed(true);
 
@@ -66,7 +77,14 @@ export default function SuccessPage() {
       />
       <span className="font-bold text-2xl">결제완료</span>
       <div className="w-full">
-        <RecentOrder />
+        {orderData?.order && (
+          <SuccessCard
+            orderData={{
+              ...orderData,
+              order: orderData.order,
+            }}
+          />
+        )}
       </div>
       <button
         onClick={handleClick}

@@ -21,7 +21,7 @@ import {
 export default function ProductDetailClient({ id }: { id: string }) {
   const router = useRouter();
   const { data, isPending, isError } = useGetProductDetail(id);
-  const { data: user } = useUser();
+  const { data: userData } = useUser();
   const [open, setOpen] = React.useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [userModalOpen, setUserModalOpen] = useState(false);
@@ -37,7 +37,7 @@ export default function ProductDetailClient({ id }: { id: string }) {
   };
 
   const handleBuyClick = () => {
-    if (!user) {
+    if (!userData?.user) {
       setUserModalOpen(true);
       return;
     }

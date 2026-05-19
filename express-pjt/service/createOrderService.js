@@ -68,6 +68,7 @@ async function createOrderService(userId) {
   try {
     session.startTransaction(); //여기서부터 작업을 묶겠다.
     //몽고디비에 저장
+    //insertMany 스타일 질문
     const order = await Order.create(
       //몽고디비Order에 배열안에 객체형태를 저장한걸 order라고 하겠다 즉 order는 배열형태
       [
@@ -80,9 +81,6 @@ async function createOrderService(userId) {
       ],
       { session }, //여기서 세션적은게 이 행위를 저장하기 위해?
     );
-
-    cart.items = []; //배열 비우기
-    await cart.save({ session }); // 카트비운거 저장 이 행위도 저장 그렇다면 cart.items = []은 왜 session안하지? 몽고디비와의 통신이 아니여서?
 
     await session.commitTransaction(); //여기까지 작업이 완료되면 커밋하겠다
 

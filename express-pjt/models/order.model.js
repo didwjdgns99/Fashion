@@ -68,6 +68,11 @@ const orderSchema = new mongoose.Schema(
       default: "상품 준비중",
     },
 
+    paidAt: {
+      type: Date,
+      default: null,
+    },
+
     paymentKey: {
       type: String,
       default: null,

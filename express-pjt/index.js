@@ -8,12 +8,7 @@ const cookieParser = require("cookie-parser");
 const limiter = require("./middlewares/rateLimit.middleware");
 const mongoose = require("mongoose");
 const botMiddleware = require("./middlewares/bot.middleware");
-const {
-  cancelPendingOrders,
-  markOrdersAsPreparing,
-  markOrdersAsShipping,
-  markOrdersAsDelivered,
-} = require("./service/orderCleanup.service");
+// const { cancelPendingOrders } = require("./service/orderCleanup.service");
 const helmet = require("helmet");
 app.use("/upload", express.static("upload"));
 app.use(helmet());
@@ -31,16 +26,13 @@ mongoose
   .then(() => {
     console.log("MongoDB 연결 성공");
 
-    setInterval(async () => {
-      try {
-        await cancelPendingOrders();
-        await markOrdersAsPreparing();
-        await markOrdersAsShipping();
-        await markOrdersAsDelivered();
-      } catch (error) {
-        console.error("주문 상태 변경 실패:", error);
-      }
-    }, 1000 * 10);
+    // setInterval(async () => {
+    //   try {
+    //     await cancelPendingOrders();
+    //   } catch (error) {
+    //     console.error("주문 상태 변경 실패:", error);
+    //   }
+    // }, 1000 * 10);
   })
   .catch((err) => console.error("MongoDB 연결 실패", err));
 

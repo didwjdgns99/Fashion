@@ -3,17 +3,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getOrdersAction } from "@/app/actions/order.action";
 
-// export type Order = {
-//   orderStatus?: string;
-//   deliveryStatus?: string;
-//   orderId?: string;
-//   orderBadge?: string;
-//   createdAt?: string;
-//   totalPrice: string;
-//   orderQuantity: number;
-//   imageUrl: string;
-// };
-
 type GetOrdersResponse = {
   isError: boolean;
   status: number;
