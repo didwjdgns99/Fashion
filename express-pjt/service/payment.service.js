@@ -1,4 +1,5 @@
 const Order = require("../models/order.model");
+const Cart = require("../models/cart.model");
 
 async function confirmPaymentService({ paymentKey, orderId, amount }) {
   if (!paymentKey || !orderId || !amount) {
@@ -66,9 +67,19 @@ async function confirmPaymentService({ paymentKey, orderId, amount }) {
     { orderId },
     {
       orderStatus: "결제완료",
+      paidAt: new Date(),
       paymentKey,
     },
     { new: true },
+  );
+
+  await Cart.updateOne(
+    { userId: order.userId },
+    {
+      $set: {
+        items: [],
+      },
+    },
   );
 
   return {

@@ -18,7 +18,7 @@ function getBadgeStyle(status?: string) {
   }
 }
 
-export default function RecentOrder() {
+export default function SuccessCard() {
   const { data } = useGetOrders();
   if (!data?.orders.length) {
     return <div>주문 내역이 없습니다.</div>;

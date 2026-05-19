@@ -15,6 +15,7 @@ export default async function confirmPaymentAction(data: {
       isError: false,
       payment: result.payment,
       message: result.message,
+      order: result.order,
     };
   } catch (error) {
     if (error instanceof ApiError) {

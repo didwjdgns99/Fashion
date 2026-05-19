@@ -1,9 +1,36 @@
 import { http } from "@/app/api/http";
+import { Payment } from "@/libs/types/payment";
+
+export type Order = {
+  _id: string;
+  orderId: string;
+  userId: string;
+
+  totalPrice: number;
+
+  orderStatus: string;
+  deliveryStatus: string;
+
+  paymentKey?: string;
+
+  items: {
+    productId: string;
+    name: string;
+    imageUrl: string;
+    price: number;
+    quantity: number;
+    size: string;
+  }[];
+
+  createdAt: string;
+  updatedAt: string;
+};
 
 type ConfirmPaymentResponse = {
   isError: boolean;
   message: string;
-  payment: unknown;
+  payment: Payment;
+  order: Order;
 };
 
 export async function confirmPaymentApi(data: {
