@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/upload/:path*",
-        destination: "http://localhost:8080/upload/:path*",
+        destination: "http://43.200.171.164/upload/:path*",
       },
     ];
   },
@@ -19,8 +19,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "plus.unsplash.com" },
       {
         protocol: "http",
-        hostname: "localhost",
-        port: "8080",
+        hostname: "43.200.171.164",
         pathname: "/upload/**",
       },
     ],
