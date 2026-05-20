@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/upload/:path*",
-        destination: "http://43.200.171.164/upload/:path*",
+        destination:
+          "http://ec2-43-200-171-164.ap-northeast-2.compute.amazonaws.com/upload/:path*",
       },
     ];
   },
@@ -19,8 +20,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "plus.unsplash.com" },
       {
         protocol: "http",
-        hostname: "localhost",
-        port: "8080",
+        hostname: "ec2-43-200-171-164.ap-northeast-2.compute.amazonaws.com",
         pathname: "/upload/**",
       },
     ],
