@@ -1,6 +1,6 @@
 // "use server";
 // import { http, ApiError } from "@/app/api/http";
-import { API_BASE_URL } from "@/app/utills/api";
+// import { API_BASE_URL } from "@/app/utills/api";
 // export const getMeAction = async () => {
 //   try {
 //     return await http(
@@ -23,7 +23,7 @@ import { API_BASE_URL } from "@/app/utills/api";
 
 export const getMeAction = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/me`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/me`, {
       method: "GET",
       credentials: "include",
     });
