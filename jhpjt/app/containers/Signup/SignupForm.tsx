@@ -69,7 +69,10 @@ export default function SignupForm() {
         },
         onError: (err) => {
           console.log(err);
-          alert("가입 실패");
+          showToast({
+            type: "error",
+            children: "회원가입 실패, 다시 시도해 주세요.",
+          });
         },
       },
     );
