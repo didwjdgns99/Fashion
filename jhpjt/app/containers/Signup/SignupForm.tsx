@@ -5,6 +5,7 @@ import Input from "@/app/components/Input/Input";
 import { useState } from "react";
 import { useSignup } from "@/libs/hooks/useSignup";
 import { useRouter } from "next/navigation";
+import showToast from "@/lib/showToast";
 import google from "@/public/image/google.png";
 
 export default function SignupForm() {
@@ -60,8 +61,11 @@ export default function SignupForm() {
       {
         onSuccess: (data) => {
           console.log("응답:", data);
-          alert("회원가입 성공");
-          router.push("/products");
+          showToast({
+            type: "success",
+            children: "회원가입 완료, 로그인 해주세요",
+          });
+          router.push("/login");
         },
         onError: (err) => {
           console.log(err);
