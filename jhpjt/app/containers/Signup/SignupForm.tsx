@@ -63,7 +63,7 @@ export default function SignupForm() {
           console.log("응답:", data);
           showToast({
             type: "success",
-            children: "회원가입 완료, 로그인 해주세요",
+            children: "회원가입 완료, 로그인 해주세요!",
           });
           router.push("/login");
         },
