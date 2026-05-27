@@ -24,7 +24,7 @@ export default function Header() {
     : null;
 
   // const imageSrc = user?.profileImage ?? null;
-
+  console.log("유저데이터", user);
   console.log("imageSrc:", imageSrc);
   return (
     <div className="flex justify-between items-center px-4 py-2 w-full h-[50px]">

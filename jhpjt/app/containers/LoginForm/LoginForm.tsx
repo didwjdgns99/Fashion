@@ -7,6 +7,7 @@ import { useLogin } from "@/libs/hooks/useLogin";
 import { useRouter } from "next/navigation";
 import google from "@/public/image/google.png";
 import showToast from "@/lib/showToast";
+import Link from "next/link";
 
 type LoginFormProps = {
   redirect: string;
@@ -103,6 +104,14 @@ export default function LoginForm({ redirect }: LoginFormProps) {
         >
           <Image src={google} alt="구글 로그인" width={24} height={24} />
         </button>
+        <div className="flex justify-center">
+          <Link
+            href="/signup"
+            className="text-gray-400 text-[14px] hover:text-black hover:underline"
+          >
+            회원가입
+          </Link>
+        </div>
       </form>
     </div>
   );
