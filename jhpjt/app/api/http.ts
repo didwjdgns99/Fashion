@@ -45,6 +45,7 @@ export async function http(
 
     const res = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
+      credentials: "include",
       signal: controller.signal, //여기서 시그날이 연결해주는 용어야? 그리고 왜  뒤에 또 signal을 붙여쓰지?
       headers: {
         ...(options.body && !isFormData
