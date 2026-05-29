@@ -3,15 +3,24 @@ require("dotenv").config();
 const express = require("express"); //improt와 같은 서버 프레임워크 가져오기
 const apiRoute = require("./routes");
 const app = express(); //app만들기 서버본체
+app.set("trust proxy", 1);
 const loggerMiddleware = require("./middlewares/logger.middleware");
 const cookieParser = require("cookie-parser");
 const limiter = require("./middlewares/rateLimit.middleware");
 const mongoose = require("mongoose");
 const botMiddleware = require("./middlewares/bot.middleware");
 // const { cancelPendingOrders } = require("./service/orderCleanup.service");
+const  cors = require("cors")
 const helmet = require("helmet");
 app.use("/upload", express.static("upload"));
 app.use(helmet());
+
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  }),
+);
 
 app.use(express.json()); //브라우저 에서 보낸 문자열을 객체로 변환
 app.use(express.urlencoded({ extended: true })); //폼을 받는 데이터를 객체로 변환 다른 타입 받으려면 별도 처리가 필요

@@ -35,6 +35,8 @@ async function googleOAuthCallback(req, res) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      domain: ".fashion-jh.shop",
+       path: "/",
       maxAge: 1000 * 60 * 60,
     });
 
@@ -51,7 +53,9 @@ function googleLogoutController(req, res) {
   try {
     res.clearCookie("token", {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+       domain: ".fashion-jh.shop",
       path: "/",
     });
 
@@ -73,3 +77,4 @@ module.exports = {
   googleOAuthCallback,
   googleLogoutController,
 };
+
