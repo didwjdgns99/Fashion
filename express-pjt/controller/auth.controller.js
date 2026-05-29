@@ -19,7 +19,12 @@ async function loginController(req, res) {
     //브라우저에 "token" 이라는 쿠키를 저장해라 값은 JWT 토큰이다
     res.cookie("token", token, {
       httpOnly: true, //JavaScript에서 쿠키 접근 불가
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax", //중간보안 간편로그인 허용
+      path: "/",
+      ...(process.env.NODE_ENV === "production" && {
+        domain: ".fashion-jh.shop",
+      }),
       maxAge: 60 * 60 * 1000, //쿠키 유효시간
     });
 

@@ -10,7 +10,7 @@ const limiter = require("./middlewares/rateLimit.middleware");
 const mongoose = require("mongoose");
 const botMiddleware = require("./middlewares/bot.middleware");
 // const { cancelPendingOrders } = require("./service/orderCleanup.service");
-const  cors = require("cors")
+const cors = require("cors");
 const helmet = require("helmet");
 app.use("/upload", express.static("upload"));
 app.use(helmet());

@@ -47,8 +47,12 @@ async function loginService({ email, password }) {
 function logoutService(res) {
   res.clearCookie("token", {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
+    ...(process.env.NODE_ENV === "production" && {
+      domain: ".fashion-jh.shop",
+    }),
   });
 
   return {

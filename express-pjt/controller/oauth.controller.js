@@ -35,8 +35,10 @@ async function googleOAuthCallback(req, res) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      domain: ".fashion-jh.shop",
-       path: "/",
+      path: "/",
+      ...(process.env.NODE_ENV === "production" && {
+        domain: ".fashion-jh.shop",
+      }),
       maxAge: 1000 * 60 * 60,
     });
 
@@ -55,8 +57,11 @@ function googleLogoutController(req, res) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-       domain: ".fashion-jh.shop",
+      domain: ".fashion-jh.shop",
       path: "/",
+      ...(process.env.NODE_ENV === "production" && {
+        domain: ".fashion-jh.shop",
+      }),
     });
 
     return res.status(200).json({
@@ -77,4 +82,3 @@ module.exports = {
   googleOAuthCallback,
   googleLogoutController,
 };
-
