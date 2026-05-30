@@ -1,6 +1,6 @@
 "use client";
 
-import { logoutAction } from "@/app/actions/logout.action";
+// import { logoutAction } from "@/app/actions/logout.action";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import showToast from "@/lib/showToast";
@@ -11,16 +11,42 @@ export default function Logout() {
   const queryClient = useQueryClient(); //캐시 저장소 접근
   const router = useRouter();
   const handleLogout = async () => {
-    const result = await logoutAction();
-    if (!result?.isError) {
+    // const result = await logoutAction();
+    // if (!result?.isError) {
+    //   queryClient.removeQueries({ queryKey: ["me"] });
+    //   queryClient.removeQueries({ queryKey: ["cart"] });
+    //   showToast({
+    //     type: "success",
+    //     children: "로그아웃 성공",
+    //   });
+    //   router.push("/products");
+    // } else {
+    //   showToast({
+    //     type: "error",
+    //     children: "로그아웃 실패",
+    //   });
+    // }
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+        },
+      );
+
+      if (!res.ok) throw new Error("로그아웃 실패");
+
       queryClient.removeQueries({ queryKey: ["me"] });
       queryClient.removeQueries({ queryKey: ["cart"] });
+
       showToast({
         type: "success",
         children: "로그아웃 성공",
       });
+
       router.push("/products");
-    } else {
+    } catch {
       showToast({
         type: "error",
         children: "로그아웃 실패",

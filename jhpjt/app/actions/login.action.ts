@@ -9,34 +9,21 @@ type LoginPayload = {
 };
 
 export const postLoginAction = async ({ email, password }: LoginPayload) => {
-  try {
-    const result = await http(API_ROUTES.LOGIN, {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
+  const result = await http(API_ROUTES.LOGIN, {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!result.isError && result.token) {
+    const cookieStore = await cookies();
+
+    cookieStore.set("token", result.token, {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60,
+      path: "/",
     });
-
-    if (!result.isError && result.token) {
-      const cookieStore = await cookies();
-
-      cookieStore.set("token", result.token, {
-        httpOnly: true,
-        sameSite: "lax",
-        maxAge: 60 * 60,
-        path: "/",
-      });
-    }
-
-    return result;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        isError: true,
-        message: error.message,
-      };
-    }
-    return {
-      isError: true,
-      message: "로그인 실패",
-    };
   }
+
+  return result;
 };
