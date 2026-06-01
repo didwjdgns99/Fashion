@@ -33,15 +33,11 @@ export const postAuthAction = async ({
       return {
         isError: true,
         status: error.status,
-        message: error.message ?? "회원가입에 실패했습니다.",
+        message: error.message,
       };
     }
 
-    return {
-      isError: true,
-      status: 500,
-      message: "알 수 없는 오류가 발생했습니다.",
-    };
+    throw new ApiError(500, "알 수 없는 오류가 발생했습니다.");
   }
 
   // if (!res.ok) {
