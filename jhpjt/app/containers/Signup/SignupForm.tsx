@@ -7,6 +7,7 @@ import { useSignup } from "@/libs/hooks/useSignup";
 import { useRouter } from "next/navigation";
 import showToast from "@/lib/showToast";
 import google from "@/public/image/google.png";
+import { ApiError } from "@/app/api/http";
 
 export default function SignupForm() {
   const [show, setShow] = useState(false);
@@ -61,18 +62,40 @@ export default function SignupForm() {
       {
         onSuccess: (data) => {
           console.log("응답:", data);
+
+          if (data.isError) {
+            showToast({
+              type: "error",
+              children: data.message,
+            });
+            return;
+          }
+
           showToast({
             type: "success",
             children: "회원가입 완료, 로그인 해주세요!",
           });
           router.push("/login");
         },
-        onError: (err) => {
-          console.log(err);
-          showToast({
-            type: "error",
-            children: "회원가입 실패, 다시 시도해 주세요.",
-          });
+        onError: (err: unknown) => {
+          const errorMessage =
+            err instanceof ApiError
+              ? err.message
+              : "알 수 없는 오류가 발생했습니다.";
+
+          if (errorMessage === "이미 존재하는 이메일입니다.") {
+            showToast({
+              type: "error",
+              children: "이미 존재하는 이메일입니다.",
+            });
+          }
+
+          if (errorMessage === "이미 존재하는 닉네임입니다.") {
+            showToast({
+              type: "error",
+              children: "이미 존재하는 닉네임입니다.",
+            });
+          }
         },
       },
     );

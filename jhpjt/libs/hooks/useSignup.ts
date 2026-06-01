@@ -9,8 +9,18 @@ export type SignupRequest = {
   nickName: string;
 };
 
+type SignupResponse = {
+  isError: boolean;
+  status?: number;
+  message: string;
+  data?: unknown;
+};
+
 export const useSignup = () => {
-  return useMutation<unknown, unknown, SignupRequest>({
-    mutationFn: postAuthAction,
+  return useMutation<SignupResponse, unknown, SignupRequest>({
+    mutationFn: async (payload) => {
+      const result = await postAuthAction(payload);
+      return result;
+    },
   });
 };
