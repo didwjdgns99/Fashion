@@ -1,11 +1,18 @@
 "use server";
 
-import { createOrderApi, getOrdersApi } from "../api/orderApi";
+import {
+  createOrderApi,
+  getOrdersApi,
+  updateOrderActionApi,
+  type ShippingAddress,
+} from "../api/orderApi";
 import { ApiError } from "@/app/api/http";
 
-export async function createOrderAction() {
+export async function createOrderAction(data: {
+  shippingAddress: ShippingAddress;
+}) {
   try {
-    const result = await createOrderApi();
+    const result = await createOrderApi(data.shippingAddress);
     return {
       isError: false,
       status: 200,
@@ -55,6 +62,49 @@ export async function getOrdersAction() {
       status: 500,
       message: "주문 조회 실패",
       orders: [],
+    };
+  }
+}
+
+export async function updateOrderAction(data: {
+  orderId: string;
+  action: "cancel" | "return";
+}) {
+  console.info("[주문 Server Action] 요청 시작", data);
+  try {
+    const result = await updateOrderActionApi(data.orderId, data.action);
+
+    console.info("[주문 Server Action] API 응답 수신", {
+      orderId: data.orderId,
+      action: data.action,
+    });
+    return {
+      isError: false,
+      status: 200,
+      message: result.message,
+    };
+  } catch (error) {
+    if (error instanceof ApiError) {
+      console.error("[주문 Server Action] API 오류", {
+        orderId: data.orderId,
+        action: data.action,
+        status: error.status,
+        message: error.message,
+      });
+      return {
+        isError: true,
+        status: error.status,
+        message: `주문 API 오류 (${error.status}): ${error.message}`,
+      };
+    }
+
+    console.error("[주문 Server Action] 처리 오류", error);
+    return {
+      isError: true,
+      status: 500,
+      message: `Server Action 처리 오류: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     };
   }
 }
