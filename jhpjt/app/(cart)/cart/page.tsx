@@ -9,11 +9,11 @@ export default async function CartPage() {
     if (!user) {
       redirect("/login");
     }
-  } catch (error) {
+  } catch {
     redirect("/login");
   }
   return (
-    <div className="px-4">
+    <div className="px-4 pb-72">
       <CartCard />
       <CartBotSheet />
     </div>

@@ -6,7 +6,7 @@ import { getMeAction } from "@/app/actions/getMe.action";
 export function useUser() {
   return useQuery({
     queryKey: ["me"],
-    queryFn: getMeAction,
+    queryFn: () => getMeAction(),
     retry: false,
     staleTime: 0,
     refetchOnMount: true,

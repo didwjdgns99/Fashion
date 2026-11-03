@@ -65,11 +65,15 @@ export async function http(
       const errorBody = isJson
         ? await res.json().catch(() => null)
         : await res.text().catch(() => "");
+      const serverMessage =
+        typeof errorBody === "object" && errorBody?.message
+          ? errorBody.message
+          : `${DEFAULT} (${res.status} ${res.statusText}; ${
+              contentType || "응답 형식 없음"
+            }; ${new URL(res.url).pathname})`;
       throw new ApiError(
         res.status,
-        typeof errorBody === "object" && errorBody?.message //express에서 객체로 에러메세지 보내주면 그걸 쓰고, 아니면 기본 메세지
-          ? errorBody.message
-          : DEFAULT,
+        serverMessage,
       );
     }
 
