@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getOrdersAction } from "@/app/actions/order.action";
+import type { ShippingAddress } from "@/app/api/orderApi";
 
 type GetOrdersResponse = {
   isError: boolean;
@@ -25,6 +26,8 @@ export type Order = {
   orderId?: string;
   orderBadge?: string;
   createdAt?: string;
+  returnRequestedAt?: string | null;
+  shippingAddress?: ShippingAddress;
   totalPrice: number;
   items: OrderItem[];
 };
@@ -33,7 +36,7 @@ export function useGetOrders() {
   console.log("useGetOrders 훅 실행됨");
   return useQuery<GetOrdersResponse>({
     queryKey: ["orders"],
-    queryFn: getOrdersAction,
+    queryFn: () => getOrdersAction(),
     retry: false,
     staleTime: 0,
     gcTime: 0,

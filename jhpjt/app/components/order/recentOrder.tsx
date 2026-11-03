@@ -1,25 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { useGetOrders } from "@/libs/hooks/useGetOrders";
-
-function getBadgeStyle(status?: string) {
-  switch (status) {
-    case "상품 준비중":
-      return "bg-blue-400 text-white";
-    case "배송중":
-      return "bg-violet-400 text-white";
-    case "배송완료":
-      return "bg-green-400 text-white";
-    case "반품/취소":
-      return "bg-red-400 text-white";
-    default:
-      return "bg-gray-300 text-black";
-  }
-}
+import OrderActions from "@/app/components/order/OrderActions";
 
 export default function SuccessCard() {
   const { data } = useGetOrders();
+  const [openOrderId, setOpenOrderId] = useState<string | null>(null);
+
   if (!data?.orders.length) {
     return <div>주문 내역이 없습니다.</div>;
   }
@@ -39,13 +28,21 @@ export default function SuccessCard() {
                 주문번호: {order.orderId}
               </span>
             </div>
-            <span
-              className={`text-[11px] font-medium px-2 py-1 rounded-xl  ${getBadgeStyle(
-                order.deliveryStatus,
-              )}`}
-            >
-              {order.deliveryStatus}
-            </span>
+            {order.orderId ? (
+              <OrderActions
+                orderId={order.orderId}
+                deliveryStatus={order.deliveryStatus}
+                returnRequestedAt={order.returnRequestedAt}
+                isOpen={openOrderId === order.orderId}
+                onOpenChange={(isOpen) =>
+                  setOpenOrderId(isOpen ? order.orderId ?? null : null)
+                }
+              />
+            ) : (
+              <span className="text-[11px] font-medium px-2 py-1 rounded-xl bg-gray-300 text-black">
+                {order.deliveryStatus}
+              </span>
+            )}
           </div>
           <div>
             <div key={order.orderId} className="flex gap-4">

@@ -3,7 +3,74 @@ const Cart = require("../models/cart.model");
 const { ORDER_RESPONSE_KEYS } = require("../constants/order");
 const mongoose = require("mongoose");
 
-async function createOrderService(userId) {
+async function createOrderService(userId, shippingAddress) {
+  if (!shippingAddress || typeof shippingAddress !== "object") {
+    const error = new Error("배송 정보를 입력해 주세요.");
+    error.status = 400;
+    throw error;
+  }
+
+  const normalizedShippingAddress = {
+    recipientName:
+      typeof shippingAddress.recipientName === "string"
+        ? shippingAddress.recipientName.trim()
+        : "",
+    recipientPhone:
+      typeof shippingAddress.recipientPhone === "string"
+        ? shippingAddress.recipientPhone.trim()
+        : "",
+    postalCode:
+      typeof shippingAddress.postalCode === "string"
+        ? shippingAddress.postalCode.trim()
+        : "",
+    address:
+      typeof shippingAddress.address === "string"
+        ? shippingAddress.address.trim()
+        : "",
+    detailAddress:
+      typeof shippingAddress.detailAddress === "string"
+        ? shippingAddress.detailAddress.trim()
+        : "",
+    deliveryRequest:
+      typeof shippingAddress.deliveryRequest === "string"
+        ? shippingAddress.deliveryRequest.trim()
+        : "",
+  };
+
+  if (
+    !normalizedShippingAddress.recipientName ||
+    !normalizedShippingAddress.recipientPhone ||
+    !normalizedShippingAddress.postalCode ||
+    !normalizedShippingAddress.address ||
+    !normalizedShippingAddress.detailAddress
+  ) {
+    const error = new Error("받는 사람, 연락처, 주소와 상세 주소를 입력해 주세요.");
+    error.status = 400;
+    throw error;
+  }
+
+  if (!/^\d{5}$/.test(normalizedShippingAddress.postalCode)) {
+    const error = new Error("유효한 우편번호를 입력해 주세요.");
+    error.status = 400;
+    throw error;
+  }
+
+  const phoneDigits = normalizedShippingAddress.recipientPhone.replace(
+    /\D/g,
+    "",
+  );
+  if (phoneDigits.length < 9 || phoneDigits.length > 11) {
+    const error = new Error("유효한 연락처를 입력해 주세요.");
+    error.status = 400;
+    throw error;
+  }
+
+  if (normalizedShippingAddress.deliveryRequest.length > 100) {
+    const error = new Error("배송 요청사항은 100자 이내로 입력해 주세요.");
+    error.status = 400;
+    throw error;
+  }
+
   //유저아이디 받아서 카트를 찾음
   const cart = await Cart.findOne({ userId }).populate(
     //cart는 productId의 name price imageUrl을 참조하여 productId가 바뀌어도 항상 최신 데이터를 받는다.
@@ -77,6 +144,7 @@ async function createOrderService(userId) {
           userId,
           items: orderItems,
           totalPrice,
+          shippingAddress: normalizedShippingAddress,
         },
       ],
       { session }, //여기서 세션적은게 이 행위를 저장하기 위해?
@@ -114,5 +182,137 @@ async function getOrderService(userId) {
   return orders;
 }
 
-module.exports = { createOrderService, getOrderService };
+async function updateOrderActionService({ userId, orderId, action }) {
+  console.info("[주문 서비스] 처리 시작", { orderId, action });
+
+  if (action !== "cancel" && action !== "return") {
+    const error = new Error("지원하지 않는 주문 처리 요청입니다.");
+    error.status = 400;
+    throw error;
+  }
+
+  const order = await Order.findOne({ userId, orderId });
+  if (!order) {
+    const error = new Error("주문 정보를 찾을 수 없습니다.");
+    error.status = 404;
+    throw error;
+  }
+  console.info("[주문 서비스] 주문 조회 완료", {
+    orderId,
+    deliveryStatus: order.deliveryStatus,
+  });
+
+  if (action === "cancel") {
+    if (order.deliveryStatus !== "상품 준비중") {
+      const error = new Error("상품 준비중인 주문만 취소할 수 있습니다.");
+      error.status = 409;
+      throw error;
+    }
+
+    if (!order.paymentKey) {
+      const error = new Error("결제 정보를 찾을 수 없어 주문을 취소할 수 없습니다.");
+      error.status = 409;
+      throw error;
+    }
+
+    const secretKey = process.env.TOSS_SECRET_KEY;
+    if (!secretKey) {
+      const error = new Error("토스 시크릿 키가 설정되어 있지 않습니다.");
+      error.status = 500;
+      throw error;
+    }
+
+    const encodedSecretKey = Buffer.from(`${secretKey}:`).toString("base64");
+    const tossResponse = await fetch(
+      `https://api.tosspayments.com/v1/payments/${encodeURIComponent(order.paymentKey)}/cancel`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${encodedSecretKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cancelReason: "고객 요청에 의한 주문 취소" }),
+      },
+    );
+    const tossResult = await tossResponse.json();
+    console.info("[주문 서비스] 결제 취소 API 응답", {
+      orderId,
+      status: tossResponse.status,
+      ok: tossResponse.ok,
+    });
+
+    if (!tossResponse.ok) {
+      const error = new Error(
+        tossResult.message || "결제 취소 요청을 완료하지 못했습니다.",
+      );
+      error.status = tossResponse.status;
+      throw error;
+    }
+
+    const canceledOrder = await Order.findOneAndUpdate(
+      {
+        _id: order._id,
+        userId,
+        deliveryStatus: "상품 준비중",
+      },
+      {
+        orderStatus: "반품/취소",
+        deliveryStatus: "반품/취소",
+      },
+      { new: true },
+    );
+
+    if (!canceledOrder) {
+      const error = new Error("주문 상태가 변경되어 취소 결과를 확인할 수 없습니다.");
+      error.status = 409;
+      throw error;
+    }
+
+    return canceledOrder;
+  }
+
+  if (
+    order.deliveryStatus !== "배송중" &&
+    order.deliveryStatus !== "배송완료"
+  ) {
+    const error = new Error("배송중 또는 배송완료 상태에서만 반품을 요청할 수 있습니다.");
+    error.status = 409;
+    throw error;
+  }
+
+  if (order.returnRequestedAt) {
+    const error = new Error("이미 반품 요청이 접수된 주문입니다.");
+    error.status = 409;
+    throw error;
+  }
+
+  const returnedOrder = await Order.findOneAndUpdate(
+    {
+      _id: order._id,
+      userId,
+      deliveryStatus: order.deliveryStatus,
+      returnRequestedAt: null,
+    },
+    {
+      returnRequestedAt: new Date(),
+      returnReason: "고객 요청",
+    },
+    { new: true },
+  );
+
+  if (!returnedOrder) {
+    const error = new Error("주문 상태가 변경되었거나 이미 반품 요청된 주문입니다.");
+    error.status = 409;
+    throw error;
+  }
+
+  console.info("[주문 서비스] 반품 요청 저장 완료", { orderId });
+  return returnedOrder;
+}
+
+module.exports = {
+  createOrderService,
+  getOrderService,
+  updateOrderActionService,
+};
 //데모결제 완성 후 setTimeout으로 status바뀌도록

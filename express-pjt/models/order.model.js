@@ -33,6 +33,43 @@ const orderItemSchema = new mongoose.Schema(
   },
 );
 
+const shippingAddressSchema = new mongoose.Schema(
+  {
+    recipientName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    recipientPhone: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    postalCode: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    address: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    detailAddress: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    deliveryRequest: {
+      type: String,
+      trim: true,
+      default: "",
+      maxlength: 100,
+    },
+  },
+  { _id: false },
+);
+
 const orderSchema = new mongoose.Schema(
   {
     orderId: {
@@ -55,6 +92,10 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    shippingAddress: {
+      type: shippingAddressSchema,
+      required: true,
+    },
 
     orderStatus: {
       type: String,
@@ -74,6 +115,14 @@ const orderSchema = new mongoose.Schema(
     },
 
     paymentKey: {
+      type: String,
+      default: null,
+    },
+    returnRequestedAt: {
+      type: Date,
+      default: null,
+    },
+    returnReason: {
       type: String,
       default: null,
     },

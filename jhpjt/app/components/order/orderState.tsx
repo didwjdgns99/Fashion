@@ -1,7 +1,12 @@
 "use client";
 
 import { useGetOrders } from "@/libs/hooks/useGetOrders";
-export type OrderState = "결제완료" | "배송중" | "배송완료" | "반품/취소";
+export type OrderState =
+  | "결제완료"
+  | "배송중"
+  | "배송완료"
+  | "반품 요청"
+  | "반품/취소";
 
 export default function OrderState() {
   const { data, isPending, isError } = useGetOrders();
@@ -27,12 +32,18 @@ export default function OrderState() {
 
   // 배송중 개수
   const shippingCount = orders.filter(
-    (order) => order.deliveryStatus === "배송중",
+    (order) =>
+      order.deliveryStatus === "배송중" && !order.returnRequestedAt,
   ).length;
 
   // 배송완료 개수
   const deliveredCount = orders.filter(
-    (order) => order.deliveryStatus === "배송완료",
+    (order) =>
+      order.deliveryStatus === "배송완료" && !order.returnRequestedAt,
+  ).length;
+
+  const returnRequestedCount = orders.filter(
+    (order) => Boolean(order.returnRequestedAt),
   ).length;
 
   // 반품/교환 개수
@@ -46,19 +57,20 @@ export default function OrderState() {
     { state: "결제완료", orderQuantity: paidCount },
     { state: "배송중", orderQuantity: shippingCount },
     { state: "배송완료", orderQuantity: deliveredCount },
+    { state: "반품 요청", orderQuantity: returnRequestedCount },
     { state: "반품/취소", orderQuantity: canceledCount },
   ];
 
   return (
     <div className="flex flex-col gap-4 px-8 bg-white py-4">
       <h3 className="font-bold text-md">주문 배송</h3>
-      <div className="flex justify-between">
+      <div className="grid grid-cols-5 gap-1">
         {states.map((item) => (
           <div key={item.state} className="flex flex-col items-center gap-1">
-            <p className="flex justify-center items-center bg-black rounded-full text-white w-12 h-12 mb-1 font-bold">
+            <p className="flex justify-center items-center bg-black rounded-full text-white w-10 h-10 sm:w-12 sm:h-12 mb-1 font-bold">
               {item.orderQuantity ?? 0}
             </p>
-            <p className="text-sm">{item.state}</p>
+            <p className="text-center text-xs sm:text-sm">{item.state}</p>
           </div>
         ))}
       </div>
