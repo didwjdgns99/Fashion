@@ -2,11 +2,12 @@
 
 import Script from "next/script";
 import { useRef, useState, type FormEvent } from "react";
-import { useCartStore } from "@/libs/store/cartStore";
+import { useCartStore, useDemoCartStore } from "@/libs/store/cartStore";
 import { loadTossPayments } from "@tosspayments/payment-sdk";
 import { createOrderAction } from "@/app/actions/order.action";
 import showToast from "@/lib/showToast";
 import type { ShippingAddress } from "@/app/api/orderApi";
+import { useUser } from "@/libs/hooks/useUser";
 
 type DaumAddress = {
   zonecode: string;
@@ -17,9 +18,7 @@ type DaumAddress = {
 declare global {
   interface Window {
     daum?: {
-      Postcode: new (options: {
-        oncomplete: (data: DaumAddress) => void;
-      }) => {
+      Postcode: new (options: { oncomplete: (data: DaumAddress) => void }) => {
         open: () => void;
       };
     };
@@ -27,7 +26,11 @@ declare global {
 }
 
 export default function CartBotSheet() {
-  const items = useCartStore((state) => state.cartItems);
+  const { data: userData } = useUser();
+  const isDemo = Boolean(userData?.user?.isDemo);
+  const normalItems = useCartStore((state) => state.cartItems);
+  const demoItems = useDemoCartStore((state) => state.cartItems);
+  const items = isDemo ? demoItems : normalItems;
   const [recipientName, setRecipientName] = useState("");
   const [recipientPhone, setRecipientPhone] = useState("");
   const [postalCode, setPostalCode] = useState("");
@@ -39,6 +42,23 @@ export default function CartBotSheet() {
   const detailAddressRef = useRef<HTMLInputElement>(null);
 
   if (items.length === 0) return null;
+
+  if (isDemo) {
+    const productTotal = items.reduce(
+      (sum, item) => sum + item.productId.price * item.quantity,
+      0,
+    );
+
+    return (
+      <div className="mx-auto mt-8 w-full max-w-2xl rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm">
+        <p className="font-bold">데모 장바구니</p>
+        <p className="mt-1">
+          총 {productTotal.toLocaleString()}원 · 체험 모드에서는 실제 주문 및
+          결제가 진행되지 않습니다.
+        </p>
+      </div>
+    );
+  }
 
   const productTotal = items.reduce(
     (sum, item) => sum + item.productId.price * item.quantity,
@@ -141,7 +161,7 @@ export default function CartBotSheet() {
   return (
     <>
       <Script
-        src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+        src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
         strategy="afterInteractive"
         onReady={() => setIsAddressSearchReady(true)}
         onError={() => {

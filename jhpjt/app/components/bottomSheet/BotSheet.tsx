@@ -3,10 +3,11 @@
 import Dropdown from "@/app/components/dropdown/Dropdown";
 import { ProductCardProps } from "@/./libs/types/products";
 import { useState } from "react";
-import { useCartStore } from "@/libs/store/cartStore";
+import { useCartStore, useDemoCartStore } from "@/libs/store/cartStore";
 import { useRouter } from "next/navigation";
 import showToast from "@/lib/showToast";
 import { addCartAction } from "@/app/actions/addCart.action";
+import { useUser } from "@/libs/hooks/useUser";
 
 interface BotSheetProps {
   onClose: () => void;
@@ -16,6 +17,37 @@ interface BotSheetProps {
 export default function BotSheet({ product, onClose }: BotSheetProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const router = useRouter();
+  const { data: userData } = useUser();
+  const isDemo = Boolean(userData?.user?.isDemo);
+
+  const addItemToCart = async (requestItem: {
+    productId: string;
+    size: string;
+    quantity: number;
+  }): Promise<boolean> => {
+    if (isDemo) {
+      useDemoCartStore.getState().addCart({
+        productId: {
+          _id: requestItem.productId,
+          name: product?.name ?? "",
+          price: product?.price ?? 0,
+          imageUrl: product?.imageUrl ?? "",
+        },
+        size: requestItem.size,
+        quantity: requestItem.quantity,
+      });
+      return true;
+    }
+
+    const result = await addCartAction(requestItem);
+    if (result.isError) {
+      showToast({ type: "error", children: result.message });
+      return false;
+    }
+    useCartStore.getState().setCartItems(result.cart.items);
+    return true;
+  };
+
   const handleAddCart = async () => {
     if (!product) return;
 
@@ -33,10 +65,8 @@ export default function BotSheet({ product, onClose }: BotSheetProps) {
       quantity: 1,
     };
 
-    const result = await addCartAction(requestItem);
-
-    // 서버가 populate해서 돌려준 최신 cart를 store에 반영
-    useCartStore.getState().setCartItems(result.cart.items);
+    const added = await addItemToCart(requestItem);
+    if (!added) return;
 
     showToast({
       type: "success",
@@ -62,9 +92,8 @@ export default function BotSheet({ product, onClose }: BotSheetProps) {
       quantity: 1,
     };
 
-    const result = await addCartAction(requestItem);
-
-    useCartStore.getState().setCartItems(result.cart.items);
+    const added = await addItemToCart(requestItem);
+    if (!added) return;
 
     onClose();
     router.push("/cart");
