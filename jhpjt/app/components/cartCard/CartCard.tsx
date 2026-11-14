@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCartStore } from "@/libs/store/cartStore";
+import { useCartStore, useDemoCartStore } from "@/libs/store/cartStore";
 import plus from "@/public/image/plus.svg";
 import minus from "@/public/image/minus.svg";
 import trash from "@/public/image/trash.svg";
@@ -12,19 +12,48 @@ import { useEffect, useRef } from "react";
 import { getCartAction } from "@/app/actions/getCart.action";
 import { deleteCartAction } from "@/app/actions/deleteCart.action";
 import { useDebounceCallback } from "@/libs/hooks/useDebounceCallback";
+import { useUser } from "@/libs/hooks/useUser";
 
 export default function CartCard() {
-  const items = useCartStore((state) => state.cartItems);
-  const removeCart = useCartStore((state) => state.removeCart);
-  const increaseQuantity = useCartStore((state) => state.increaseQuantity);
-  const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
-  const setCartItems = useCartStore((state) => state.setCartItems);
-  const setItemQuantity = useCartStore((state) => state.setItemQuantity);
+  const { data: userData, isPending: isUserPending } = useUser();
+  const isDemo = Boolean(userData?.user?.isDemo);
+  const normalItems = useCartStore((state) => state.cartItems);
+  const demoItems = useDemoCartStore((state) => state.cartItems);
+  const items = isDemo ? demoItems : normalItems;
+  const normalRemoveCart = useCartStore((state) => state.removeCart);
+  const demoRemoveCart = useDemoCartStore((state) => state.removeCart);
+  const removeCart = isDemo ? demoRemoveCart : normalRemoveCart;
+  const normalIncreaseQuantity = useCartStore((state) => state.increaseQuantity);
+  const demoIncreaseQuantity = useDemoCartStore(
+    (state) => state.increaseQuantity,
+  );
+  const increaseQuantity = isDemo
+    ? demoIncreaseQuantity
+    : normalIncreaseQuantity;
+  const normalDecreaseQuantity = useCartStore((state) => state.decreaseQuantity);
+  const demoDecreaseQuantity = useDemoCartStore(
+    (state) => state.decreaseQuantity,
+  );
+  const decreaseQuantity = isDemo
+    ? demoDecreaseQuantity
+    : normalDecreaseQuantity;
+  const normalSetCartItems = useCartStore((state) => state.setCartItems);
+  const demoSetCartItems = useDemoCartStore((state) => state.setCartItems);
+  const setCartItems = isDemo ? demoSetCartItems : normalSetCartItems;
+  const normalSetItemQuantity = useCartStore((state) => state.setItemQuantity);
+  const demoSetItemQuantity = useDemoCartStore(
+    (state) => state.setItemQuantity,
+  );
+  const setItemQuantity = isDemo
+    ? demoSetItemQuantity
+    : normalSetItemQuantity;
 
   const rollbackRef = useRef<Record<string, number>>({});
 
   const quantityDebounce = useDebounceCallback(500);
   useEffect(() => {
+    if (isUserPending || isDemo) return;
+
     async function fetchCart() {
       try {
         const result = await getCartAction();
@@ -35,7 +64,7 @@ export default function CartCard() {
     }
 
     fetchCart();
-  }, [setCartItems]);
+  }, [isDemo, isUserPending, setCartItems]);
 
   const handleIncrease = async (item: CartItem) => {
     const key = `${item.productId._id}-${item.size}`;
@@ -47,6 +76,7 @@ export default function CartCard() {
 
     const next = item.quantity + 1;
     increaseQuantity(item.productId._id, item.size);
+    if (isDemo) return;
     quantityDebounce(async () => {
       try {
         await PatchCartAction({
@@ -79,6 +109,7 @@ export default function CartCard() {
     if (item.quantity <= 1) return;
 
     decreaseQuantity(item.productId._id, item.size);
+    if (isDemo) return;
     quantityDebounce(async () => {
       try {
         await PatchCartAction({
@@ -99,6 +130,11 @@ export default function CartCard() {
   };
 
   const handleDelete = async (item: CartItem) => {
+    if (isDemo) {
+      removeCart(item.productId._id, item.size);
+      return;
+    }
+
     try {
       await deleteCartAction({
         productId: item.productId._id,

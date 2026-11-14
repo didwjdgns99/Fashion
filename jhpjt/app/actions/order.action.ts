@@ -7,10 +7,19 @@ import {
   type ShippingAddress,
 } from "../api/orderApi";
 import { ApiError } from "@/app/api/http";
+import { cookies } from "next/headers";
 
 export async function createOrderAction(data: {
   shippingAddress: ShippingAddress;
 }) {
+  if ((await cookies()).get("demo-mode")?.value === "1") {
+    return {
+      isError: true,
+      status: 403,
+      message: "체험 모드에서는 주문할 수 없습니다.",
+    };
+  }
+
   try {
     const result = await createOrderApi(data.shippingAddress);
     return {

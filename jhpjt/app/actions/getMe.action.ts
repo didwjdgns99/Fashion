@@ -1,8 +1,23 @@
 "use server";
 import { http, ApiError } from "@/app/api/http";
+import { cookies } from "next/headers";
 
 // import { API_BASE_URL } from "@/app/utills/api";
 export const getMeAction = async () => {
+  const cookieStore = await cookies();
+  if (cookieStore.get("demo-mode")?.value === "1") {
+    return {
+      user: {
+        id: "demo-user",
+        _id: "demo-user",
+        email: "demo@example.com",
+        nickName: "데모 사용자",
+        profileImage: null,
+        isDemo: true,
+      },
+    };
+  }
+
   try {
     return await http(
       "/api/me",
